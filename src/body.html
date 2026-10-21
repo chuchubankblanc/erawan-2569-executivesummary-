@@ -80,17 +80,20 @@
         <div class="zx-picto" id="zx-sex" role="img" aria-label="สัดส่วนเพศผู้ป่วย 1 รูปคนเท่ากับ 5% ของเคส"></div>
         <p class="zx-note">1 รูปคน = 5% ของเคส · ค่า 0 หรือว่างในไฟล์ นับเป็น “ไม่ระบุ”</p>
       </section>
-      <section class="zx-box zx-t2 zx-c3" id="zx-cpr-box" data-source="traits" aria-labelledby="zx-cpr-h">
+      <section class="zx-box zx-t2 zx-c6 zx-cprbox" id="zx-cpr-box" data-source="traits" aria-labelledby="zx-cpr-h">
         <span class="zx-role">ตัวชี้วัดหลัก</span>
-        <h2 id="zx-cpr-h">การทำ CPR</h2>
+        <h2 id="zx-cpr-h">CPR และการเสียชีวิต ณ จุดเกิดเหตุ</h2>
+        <div class="zx-cprkpi" id="zx-cprkpi"></div>
+        <div>
+          <p class="zx-lab2">ผลลัพธ์หลังทำ CPR แยกตามวิธี</p>
+          <div class="zx-legend" id="zx-cpr-leg"></div>
+          <div class="zx-outrows" id="zx-cpr" role="img" aria-label="ผลลัพธ์ของผู้ป่วยที่ได้รับ CPR หรือ AED/DF แยกตามวิธี"></div>
+        </div>
+        <div>
+          <p class="zx-lab2" id="zx-dead-h">เสียชีวิต ณ จุดเกิดเหตุ ทั้งหมด</p>
+          <div class="zx-deadsplit" id="zx-dead"></div>
+        </div>
         <p class="zx-note" id="zx-cpr-note"></p>
-        <div class="zx-rows" id="zx-cpr"></div>
-      </section>
-      <section class="zx-box zx-t2 zx-c3 zx-deadbox" id="zx-care-box" data-source="traits" aria-labelledby="zx-care-h">
-        <span class="zx-role">ตัวชี้วัดหลัก</span>
-        <h2 id="zx-care-h">เสียชีวิต ณ จุดเกิดเหตุ</h2>
-        <div class="zx-dead" id="zx-dead"></div>
-        <p class="zx-note" id="zx-dead-note"></p>
       </section>
       <section class="zx-box zx-t2 zx-c12" id="zx-hosp-box" data-source="hospstats traits" aria-labelledby="zx-hosp-h">
         <span class="zx-role">ตัวชี้วัดหลัก</span>
@@ -206,6 +209,7 @@
             <dt>กลุ่มอายุ (คอลัมน์ Q)</dt><dd>เด็ก 0–14 ปี · ผู้ใหญ่ 15–59 ปี · ผู้สูงอายุ 60 ปีขึ้นไป · อายุ 0 หรือว่าง = ไม่ระบุ</dd>
             <dt>เพศ (คอลัมน์ R)</dt><dd>ชาย / หญิง ตามที่บันทึก ค่า 0 หรือว่าง = ไม่ระบุ</dd>
             <dt>การทำ CPR (คอลัมน์ S)</dt><dd>Yes = CPR · Yes,AED/DF = CPR + AED/DF · AED/DF = AED/DF อย่างเดียว · No = ไม่ได้ทำ</dd>
+            <dt>CPR × ผลลัพธ์ (คอลัมน์ S × T)</dt><dd>รอดชีวิต = ผลการดูแลเบื้องต้นไม่ได้ลงว่าเสียชีวิต (รวมช่องว่าง) · เสียชีวิตขณะนำส่งแยกแสดง · “ไม่ได้ทำ CPR” = ช่อง CPR เป็น No</dd>
             <dt>เสียชีวิต ณ จุดเกิดเหตุ (คอลัมน์ T)</dt><dd>เคสที่ผลการดูแลรักษาเบื้องต้นบันทึกว่า “เสียชีวิต ณ จุดเกิดเหตุ” ร้อยละคิดจากเคสทั้งหมดในพื้นที่ที่เลือก (ไม่รวม “เสียชีวิตขณะนำส่ง”)</dd>
             <dt>โรงพยาบาลปลายทาง (คอลัมน์ U)</dt><dd>ชื่อห้องฉุกเฉินที่นำส่ง ค่า 0 หรือว่าง = ไม่ได้นำส่ง / ไม่มีบันทึก</dd>
             <dt>เขต</dt><dd>เขตที่เกิดเหตุ ไม่ใช่เขตที่ตั้งของหน่วย</dd>

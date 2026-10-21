@@ -4,7 +4,7 @@
   const G4LONG = { Basic: 'Basic (BLS)', Advance: 'Advance (ALS)', 'อื่นๆ': 'อื่นๆ (ML · CLS · FR · ERB)', 'ไม่ระบุ': 'ไม่ระบุระดับ' };
   const ZONES = d3.range(1, 12);
   const GROUPS = ['ศูนย์เอราวัณ', 'โรงพยาบาล', 'มูลนิธิ / กู้ชีพ'];
-  const DIMS = ['combo', 'tambon', 'hour', 'dow', 'outcome', 'age', 'sex', 'cpr', 'care', 'hosp'];
+  const DIMS = ['combo', 'tambon', 'hour', 'dow', 'outcome', 'age', 'sex', 'cpr', 'care', 'hosp', 'cprout'];
   const AGES = ['เด็ก', 'ผู้ใหญ่', 'ผู้สูงอายุ', 'ไม่ระบุ'];
   const AGEDEF = { 'เด็ก': 'เด็ก 0–14 ปี', 'ผู้ใหญ่': 'ผู้ใหญ่ 15–59 ปี', 'ผู้สูงอายุ': 'ผู้สูงอายุ ≥60 ปี', 'ไม่ระบุ': 'ไม่ระบุอายุ' };
   const SEXES = ['ชาย', 'หญิง', 'ไม่ระบุ'];
@@ -504,19 +504,82 @@
     for (let i = 0; i < counts[2]; i++) pic.appendChild(person(i % 2 ? FEMALE : MALE, 'var(--lv-unk)'));
     hover(pic, 'เพศผู้ป่วย', [['var(--sx-m)', 'ชาย ' + fmt(m) + ' (' + share(m, T) + ')'], ['var(--sx-f)', 'หญิง ' + fmt(f) + ' (' + share(f, T) + ')'], ['var(--lv-unk)', 'ไม่ระบุ ' + fmt(u) + ' (' + share(u, T) + ')']]);
 
-    const cprKeys = CPRS.concat([...cur.tr.cpr.keys()].filter((k) => !CPRS.includes(k)).sort());
-    const any = cprAny(cur);
-    $('zx-cpr-note').textContent = 'ทำ CPR หรือ AED/DF รวม ' + fmt(any) + ' เคส (' + share(any, T) + ')';
-    valRows($('zx-cpr'), cprKeys.map((k) => ({ label: k, v: trv(cur, 'cpr', k), color: /^ไม่/.test(k) ? 'var(--lv-unk)' : 'var(--lv-adv)', hot: /CPR|AED/.test(k) })), T);
-
-    const dead = trv(cur, 'care', DEAD);
-    const db = $('zx-dead');
-    const n = el('span', 'n', fmt(dead));
-    const lbl = el('span', null, 'จำนวน ');
-    lbl.append(el('b', null, fmt(dead)), document.createTextNode(' เคส คิดเป็นร้อยละ '), el('b', null, T ? d3.format('.2f')(dead / T * 100) : '—'));
-    db.replaceChildren(n, lbl);
-    $('zx-dead-note').textContent = 'ร้อยละคิดจากเคสทั้งหมด ' + fmt(T) + ' เคส · ' + dlabel(zone, sel) + (lf === 'all' ? '' : ' · ' + lf);
+    renderCprOutcome(cur);
     renderHosp(cur);
+  }
+
+  /* CPR x outcome: survival after CPR by method, and whether dead-at-scene cases got CPR */
+  const OUTS4 = [
+    ['alive', 'รอดชีวิต (มีบันทึกผล)', 'var(--o-alive)'],
+    ['blank', 'รอดชีวิต (ช่องผลว่าง)', 'var(--o-blank)'],
+    ['dead_tx', 'เสียชีวิตขณะนำส่ง', 'var(--o-tx)'],
+    ['dead', 'เสียชีวิต ณ จุดเกิดเหตุ', 'var(--o-dead)']
+  ];
+  const CPRDONE = ['CPR', 'CPR + AED/DF', 'AED/DF อย่างเดียว'];
+  const CPRNAME = { CPR: 'CPR อย่างเดียว', 'CPR + AED/DF': 'CPR + AED/DF', 'AED/DF อย่างเดียว': 'AED/DF อย่างเดียว' };
+  function renderCprOutcome(cur) {
+    const T = cur.total;
+    const co = (g, o) => trv(cur, 'cprout', g + '|' + o);
+    const grp = (g) => { const x = {}; OUTS4.forEach(([o]) => { x[o] = co(g, o); }); x.n = d3.sum(OUTS4, ([o]) => x[o]); return x; };
+    const done = CPRDONE.map((g) => [g, grp(g)]);
+    const sumK = (k) => d3.sum(done, (d) => d[1][k]);
+    const nCpr = sumK('n'), alive = sumK('alive') + sumK('blank'), blankC = sumK('blank'), deadC = sumK('dead');
+    const deadAll = trv(cur, 'care', DEAD);
+    const deadNo = deadAll - deadC;
+    const pct2 = (n, d) => (d ? d3.format('.2f')(n / d * 100) : '—');
+
+    const kpi = $('zx-cprkpi');
+    kpi.replaceChildren();
+    const tile = (cls, label, v, sub) => {
+      const k = el('div', 'k ' + cls);
+      k.append(el('span', 'l', label), el('span', 'v', v), el('span', 's', sub));
+      kpi.appendChild(k);
+    };
+    tile('', 'ทำ CPR หรือ AED/DF', fmt(nCpr), share(nCpr, T) + ' ของเคสทั้งหมด');
+    tile('alive', 'รอดชีวิตหลัง CPR', share(alive, nCpr), fmt(alive) + ' เคส · ช่องผลว่าง ' + fmt(blankC));
+    tile('dead', 'เสียชีวิต ณ จุดเกิดเหตุ', fmt(deadAll), 'ร้อยละ ' + pct2(deadAll, T) + ' ของเคสทั้งหมด');
+
+    legend($('zx-cpr-leg'), OUTS4.map(([, l, c]) => [l, c]));
+    const box = $('zx-cpr');
+    box.replaceChildren();
+    done.forEach(([g, x]) => {
+      const row = el('div', 'zx-orow');
+      const nm = el('span', 'nm', CPRNAME[g]);
+      nm.appendChild(el('small', null, fmt(x.n) + ' เคส'));
+      const bar = el('div', 'bar');
+      OUTS4.forEach(([o, , c]) => {
+        if (!x[o]) return;
+        const w = x[o] / x.n;
+        const sp = el('span', o === 'blank' ? 'lt' : null, w >= 0.12 ? pct(w) : '');
+        sp.style.width = (w * 100) + '%';
+        sp.style.background = c;
+        bar.appendChild(sp);
+      });
+      if (!x.n) bar.appendChild(el('span', 'lt', '—'));
+      const rs = el('span', 'rs');
+      rs.append(el('b', null, share(x.alive + x.blank, x.n)), el('small', null, 'รอดชีวิต'));
+      row.append(nm, bar, rs);
+      hover(row, CPRNAME[g] + ' · ' + fmt(x.n) + ' เคส', OUTS4.map(([o, l, c]) => [c, l + ': ' + fmt(x[o]) + ' (' + share(x[o], x.n) + ')']));
+      box.appendChild(row);
+    });
+
+    $('zx-dead-h').textContent = 'เสียชีวิต ณ จุดเกิดเหตุ ' + fmt(deadAll) + ' เคส ได้ทำ CPR หรือไม่';
+    const ds = $('zx-dead');
+    ds.replaceChildren();
+    const bar = el('div', 'bar');
+    const a = el('span', 'cpr', deadAll && deadC / deadAll >= 0.18 ? 'ทำ CPR/AED ' + fmt(deadC) : '');
+    a.style.width = (deadAll ? deadC / deadAll * 100 : 0) + '%';
+    const b = el('span', 'no', deadAll && deadNo / deadAll >= 0.18 ? 'ไม่ได้ทำ CPR ' + fmt(deadNo) : '');
+    b.style.width = (deadAll ? deadNo / deadAll * 100 : 0) + '%';
+    if (deadC) bar.appendChild(a);
+    if (deadNo) bar.appendChild(b);
+    hover(bar, 'เสียชีวิต ณ จุดเกิดเหตุ ' + fmt(deadAll) + ' เคส', [['color-mix(in srgb, var(--o-dead) 45%, var(--color-bg))', 'ทำ CPR/AED ก่อนลงเสียชีวิต: ' + fmt(deadC) + ' (' + share(deadC, deadAll) + ')'], ['var(--o-dead)', 'ไม่ได้ทำ CPR: ' + fmt(deadNo) + ' (' + share(deadNo, deadAll) + ')']]);
+    const cap = el('div', 'cap');
+    const c1 = el('span'); c1.append(document.createTextNode('ทำ CPR/AED แล้วเสียชีวิต '), el('b', null, fmt(deadC) + ' · ' + share(deadC, deadAll)));
+    const c2 = el('span'); c2.append(document.createTextNode('เสียชีวิตโดยไม่ได้ทำ CPR '), el('b', null, fmt(deadNo) + ' · ' + share(deadNo, deadAll)));
+    cap.append(c1, c2);
+    ds.append(bar, cap);
+    $('zx-cpr-note').textContent = 'รอดชีวิต = ไม่ได้ลงว่าเสียชีวิต (นับรวมเคสที่ช่องผลการดูแลเบื้องต้นว่าง) · เสียชีวิตขณะนำส่งแยกไว้ต่างหาก · ร้อยละในแถบคิดจากเคสที่ทำ CPR วิธีนั้น · ' + dlabel(zone, sel) + (lf === 'all' ? '' : ' · ' + lf);
   }
 
   const HCOLS = [['name', 'โรงพยาบาล'], ['Basic', 'Basic'], ['Advance', 'Advance'], ['อื่นๆ', 'อื่นๆ'], ['ไม่ระบุ', 'ไม่ระบุ'], ['total', 'รวม'], ['share', '% ของเคสที่นำส่ง']];

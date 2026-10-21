@@ -206,6 +206,12 @@ def main():
             'care': 'ไม่มีบันทึก' if blank(r['care']) else clean(r['care']),
             'hosp': 'ไม่ได้นำส่ง / ไม่มีบันทึก' if blank(r['hosp']) else clean(r['hosp']),
         }
+        # CPR x ผลลัพธ์: dead = เสียชีวิต ณ จุดเกิดเหตุ, dead_tx = เสียชีวิตขณะนำส่ง,
+        # alive = มีบันทึกผลอื่น, blank = ช่องผลการดูแลว่าง (ไม่ได้ลงว่าเสียชีวิต)
+        care = dims['care']
+        out4 = ('dead' if care == 'เสียชีวิต ณ จุดเกิดเหตุ' else 'dead_tx' if care == 'เสียชีวิตขณะนำส่ง'
+                else 'blank' if care == 'ไม่มีบันทึก' else 'alive')
+        dims['cprout'] = cpr + '|' + out4
         try:
             if float(clean(r['age']) or 0) > 120:
                 oddity['อายุเกิน 120 ปี (นับเป็นไม่ระบุ)'] += 1

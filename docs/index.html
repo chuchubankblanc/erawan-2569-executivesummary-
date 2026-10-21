@@ -50,6 +50,7 @@ img { max-width: 100%; }
   --sx-m: #1f7f86; --sx-f: #9b4d8a;
   --ag-1: #9fd3bd; --ag-2: #3f9a76; --ag-3: #165c43;
   --pa: #1f7a58; --pb: #b07d12;
+  --o-dead: #c8323c; --o-tx: #7c1d24; --o-alive: #2f8a6a; --o-blank: #a9cfbf;
   --bar: #2f8a6a;
   --tint-green: color-mix(in srgb, #2f9e75 13%, var(--color-bg));
   --tint-blue: color-mix(in srgb, #2b7bb9 12%, var(--color-bg));
@@ -60,9 +61,9 @@ img { max-width: 100%; }
   --edge: color-mix(in srgb, var(--color-fg) 12%, transparent);
 }
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .zx { --lv-basic: #4a95d0; --lv-adv: #e5636a; --lv-oth: #d6a02a; --lv-unk: #8794a0; --bar: #4fb48f; --g900: #0b2c21; --g800: #104030; --lv-ml: #d6a02a; --lv-cls: #b8862a; --lv-fr: #f0d48a; --lv-erb: #8f6d24; --sx-m: #45b0b8; --sx-f: #c77bb5; --ag-1: #b5e2cf; --ag-2: #58b48e; --ag-3: #2a7d5d; --pa: #4fb48f; --pb: #d6a02a; }
+  :root:not([data-theme="light"]) .zx { --lv-basic: #4a95d0; --lv-adv: #e5636a; --lv-oth: #d6a02a; --lv-unk: #8794a0; --bar: #4fb48f; --g900: #0b2c21; --g800: #104030; --lv-ml: #d6a02a; --lv-cls: #b8862a; --lv-fr: #f0d48a; --lv-erb: #8f6d24; --sx-m: #45b0b8; --sx-f: #c77bb5; --ag-1: #b5e2cf; --ag-2: #58b48e; --ag-3: #2a7d5d; --pa: #4fb48f; --pb: #d6a02a; --o-dead: #e5636a; --o-tx: #a63a43; --o-alive: #4fb48f; --o-blank: #2f5a4a; }
 }
-:root[data-theme="dark"] .zx { --lv-basic: #4a95d0; --lv-adv: #e5636a; --lv-oth: #d6a02a; --lv-unk: #8794a0; --bar: #4fb48f; --g900: #0b2c21; --g800: #104030; --lv-ml: #d6a02a; --lv-cls: #b8862a; --lv-fr: #f0d48a; --lv-erb: #8f6d24; --sx-m: #45b0b8; --sx-f: #c77bb5; --ag-1: #b5e2cf; --ag-2: #58b48e; --ag-3: #2a7d5d; --pa: #4fb48f; --pb: #d6a02a; }
+:root[data-theme="dark"] .zx { --lv-basic: #4a95d0; --lv-adv: #e5636a; --lv-oth: #d6a02a; --lv-unk: #8794a0; --bar: #4fb48f; --g900: #0b2c21; --g800: #104030; --lv-ml: #d6a02a; --lv-cls: #b8862a; --lv-fr: #f0d48a; --lv-erb: #8f6d24; --sx-m: #45b0b8; --sx-f: #c77bb5; --ag-1: #b5e2cf; --ag-2: #58b48e; --ag-3: #2a7d5d; --pa: #4fb48f; --pb: #d6a02a; --o-dead: #e5636a; --o-tx: #a63a43; --o-alive: #4fb48f; --o-blank: #2f5a4a; }
 
 .zx { position: relative; display: grid; grid-template-columns: 15.5rem minmax(0, 1fr); font-family: var(--font-anthropic-sans); color: var(--color-fg); font-size: var(--cds-font-size-body); background: var(--canvas); }
 .zx *, .zx *::before, .zx *::after { box-sizing: border-box; }
@@ -320,6 +321,34 @@ button.it { cursor: pointer; }
 .zx-cmp td:last-child { min-width: 13rem; }
 @media (max-width: 1100px) and (min-width: 821px) { .zx-c3 { grid-column: span 6; } }
 
+/* CPR x outcome */
+.zx-lab2 { margin: 0 0 .45rem; font-size: var(--cds-font-size-caption); font-weight: 600; }
+.zx-cprkpi { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .6rem; }
+.zx-cprkpi .k { display: flex; flex-direction: column; gap: .1rem; padding: .65rem .8rem; border-radius: 12px; background: color-mix(in srgb, var(--color-fg) 5%, var(--color-bg)); min-width: 0; }
+.zx-cprkpi .k.alive { background: color-mix(in srgb, var(--o-alive) 14%, var(--color-bg)); }
+.zx-cprkpi .k.dead { background: color-mix(in srgb, var(--o-dead) 13%, var(--color-bg)); }
+.zx-cprkpi .l { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); line-height: 1.35; }
+.zx-cprkpi .v { font-size: 1.9rem; font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.zx-cprkpi .s { font-size: var(--cds-font-size-caption); font-variant-numeric: tabular-nums; }
+.zx-outrows { display: flex; flex-direction: column; gap: .55rem; margin-top: .5rem; }
+.zx-orow { display: grid; grid-template-columns: minmax(6.5rem, 9rem) minmax(0, 1fr) 4.6rem; gap: .6rem; align-items: center; }
+.zx-orow .nm { font-size: var(--cds-font-size-caption); line-height: 1.3; }
+.zx-orow .nm small { display: block; color: var(--color-fg-muted); font-variant-numeric: tabular-nums; }
+.zx-orow .bar { display: flex; height: 1.6rem; border-radius: 8px; overflow: hidden; gap: 2px; }
+.zx-orow .bar span { display: flex; align-items: center; justify-content: center; min-width: 3px; font-size: .6875rem; font-weight: 600; color: #fff; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; }
+.zx-orow .bar span.lt { color: var(--color-fg); }
+.zx-orow .rs { text-align: right; font-variant-numeric: tabular-nums; line-height: 1.2; }
+.zx-orow .rs b { display: block; font-size: 1.05rem; color: var(--o-alive); }
+.zx-orow .rs small { font-size: .6875rem; color: var(--color-fg-muted); }
+.zx-deadsplit { display: flex; flex-direction: column; gap: .4rem; }
+.zx-deadsplit .bar { display: flex; height: 2.2rem; border-radius: 10px; overflow: hidden; gap: 2px; }
+.zx-deadsplit .bar span { display: flex; align-items: center; padding: 0 .6rem; min-width: 3px; font-size: var(--cds-font-size-caption); font-weight: 600; white-space: nowrap; overflow: hidden; font-variant-numeric: tabular-nums; }
+.zx-deadsplit .bar .cpr { background: color-mix(in srgb, var(--o-dead) 45%, var(--color-bg)); color: var(--color-fg); }
+.zx-deadsplit .bar .no { background: var(--o-dead); color: #fff; justify-content: flex-end; }
+.zx-deadsplit .cap { display: flex; justify-content: space-between; gap: .8rem; font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+.zx-deadsplit .cap b { color: var(--color-fg); font-variant-numeric: tabular-nums; }
+@media (max-width: 820px) { .zx-cprkpi { grid-template-columns: minmax(0, 1fr); } }
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
 </head>
@@ -407,17 +436,20 @@ button.it { cursor: pointer; }
         <div class="zx-picto" id="zx-sex" role="img" aria-label="สัดส่วนเพศผู้ป่วย 1 รูปคนเท่ากับ 5% ของเคส"></div>
         <p class="zx-note">1 รูปคน = 5% ของเคส · ค่า 0 หรือว่างในไฟล์ นับเป็น “ไม่ระบุ”</p>
       </section>
-      <section class="zx-box zx-t2 zx-c3" id="zx-cpr-box" data-source="traits" aria-labelledby="zx-cpr-h">
+      <section class="zx-box zx-t2 zx-c6 zx-cprbox" id="zx-cpr-box" data-source="traits" aria-labelledby="zx-cpr-h">
         <span class="zx-role">ตัวชี้วัดหลัก</span>
-        <h2 id="zx-cpr-h">การทำ CPR</h2>
+        <h2 id="zx-cpr-h">CPR และการเสียชีวิต ณ จุดเกิดเหตุ</h2>
+        <div class="zx-cprkpi" id="zx-cprkpi"></div>
+        <div>
+          <p class="zx-lab2">ผลลัพธ์หลังทำ CPR แยกตามวิธี</p>
+          <div class="zx-legend" id="zx-cpr-leg"></div>
+          <div class="zx-outrows" id="zx-cpr" role="img" aria-label="ผลลัพธ์ของผู้ป่วยที่ได้รับ CPR หรือ AED/DF แยกตามวิธี"></div>
+        </div>
+        <div>
+          <p class="zx-lab2" id="zx-dead-h">เสียชีวิต ณ จุดเกิดเหตุ ทั้งหมด</p>
+          <div class="zx-deadsplit" id="zx-dead"></div>
+        </div>
         <p class="zx-note" id="zx-cpr-note"></p>
-        <div class="zx-rows" id="zx-cpr"></div>
-      </section>
-      <section class="zx-box zx-t2 zx-c3 zx-deadbox" id="zx-care-box" data-source="traits" aria-labelledby="zx-care-h">
-        <span class="zx-role">ตัวชี้วัดหลัก</span>
-        <h2 id="zx-care-h">เสียชีวิต ณ จุดเกิดเหตุ</h2>
-        <div class="zx-dead" id="zx-dead"></div>
-        <p class="zx-note" id="zx-dead-note"></p>
       </section>
       <section class="zx-box zx-t2 zx-c12" id="zx-hosp-box" data-source="hospstats traits" aria-labelledby="zx-hosp-h">
         <span class="zx-role">ตัวชี้วัดหลัก</span>
@@ -533,6 +565,7 @@ button.it { cursor: pointer; }
             <dt>กลุ่มอายุ (คอลัมน์ Q)</dt><dd>เด็ก 0–14 ปี · ผู้ใหญ่ 15–59 ปี · ผู้สูงอายุ 60 ปีขึ้นไป · อายุ 0 หรือว่าง = ไม่ระบุ</dd>
             <dt>เพศ (คอลัมน์ R)</dt><dd>ชาย / หญิง ตามที่บันทึก ค่า 0 หรือว่าง = ไม่ระบุ</dd>
             <dt>การทำ CPR (คอลัมน์ S)</dt><dd>Yes = CPR · Yes,AED/DF = CPR + AED/DF · AED/DF = AED/DF อย่างเดียว · No = ไม่ได้ทำ</dd>
+            <dt>CPR × ผลลัพธ์ (คอลัมน์ S × T)</dt><dd>รอดชีวิต = ผลการดูแลเบื้องต้นไม่ได้ลงว่าเสียชีวิต (รวมช่องว่าง) · เสียชีวิตขณะนำส่งแยกแสดง · “ไม่ได้ทำ CPR” = ช่อง CPR เป็น No</dd>
             <dt>เสียชีวิต ณ จุดเกิดเหตุ (คอลัมน์ T)</dt><dd>เคสที่ผลการดูแลรักษาเบื้องต้นบันทึกว่า “เสียชีวิต ณ จุดเกิดเหตุ” ร้อยละคิดจากเคสทั้งหมดในพื้นที่ที่เลือก (ไม่รวม “เสียชีวิตขณะนำส่ง”)</dd>
             <dt>โรงพยาบาลปลายทาง (คอลัมน์ U)</dt><dd>ชื่อห้องฉุกเฉินที่นำส่ง ค่า 0 หรือว่าง = ไม่ได้นำส่ง / ไม่มีบันทึก</dd>
             <dt>เขต</dt><dd>เขตที่เกิดเหตุ ไม่ใช่เขตที่ตั้งของหน่วย</dd>
@@ -587,7 +620,7 @@ button.it { cursor: pointer; }
   const G4LONG = { Basic: 'Basic (BLS)', Advance: 'Advance (ALS)', 'อื่นๆ': 'อื่นๆ (ML · CLS · FR · ERB)', 'ไม่ระบุ': 'ไม่ระบุระดับ' };
   const ZONES = d3.range(1, 12);
   const GROUPS = ['ศูนย์เอราวัณ', 'โรงพยาบาล', 'มูลนิธิ / กู้ชีพ'];
-  const DIMS = ['combo', 'tambon', 'hour', 'dow', 'outcome', 'age', 'sex', 'cpr', 'care', 'hosp'];
+  const DIMS = ['combo', 'tambon', 'hour', 'dow', 'outcome', 'age', 'sex', 'cpr', 'care', 'hosp', 'cprout'];
   const AGES = ['เด็ก', 'ผู้ใหญ่', 'ผู้สูงอายุ', 'ไม่ระบุ'];
   const AGEDEF = { 'เด็ก': 'เด็ก 0–14 ปี', 'ผู้ใหญ่': 'ผู้ใหญ่ 15–59 ปี', 'ผู้สูงอายุ': 'ผู้สูงอายุ ≥60 ปี', 'ไม่ระบุ': 'ไม่ระบุอายุ' };
   const SEXES = ['ชาย', 'หญิง', 'ไม่ระบุ'];
@@ -1087,19 +1120,82 @@ button.it { cursor: pointer; }
     for (let i = 0; i < counts[2]; i++) pic.appendChild(person(i % 2 ? FEMALE : MALE, 'var(--lv-unk)'));
     hover(pic, 'เพศผู้ป่วย', [['var(--sx-m)', 'ชาย ' + fmt(m) + ' (' + share(m, T) + ')'], ['var(--sx-f)', 'หญิง ' + fmt(f) + ' (' + share(f, T) + ')'], ['var(--lv-unk)', 'ไม่ระบุ ' + fmt(u) + ' (' + share(u, T) + ')']]);
 
-    const cprKeys = CPRS.concat([...cur.tr.cpr.keys()].filter((k) => !CPRS.includes(k)).sort());
-    const any = cprAny(cur);
-    $('zx-cpr-note').textContent = 'ทำ CPR หรือ AED/DF รวม ' + fmt(any) + ' เคส (' + share(any, T) + ')';
-    valRows($('zx-cpr'), cprKeys.map((k) => ({ label: k, v: trv(cur, 'cpr', k), color: /^ไม่/.test(k) ? 'var(--lv-unk)' : 'var(--lv-adv)', hot: /CPR|AED/.test(k) })), T);
-
-    const dead = trv(cur, 'care', DEAD);
-    const db = $('zx-dead');
-    const n = el('span', 'n', fmt(dead));
-    const lbl = el('span', null, 'จำนวน ');
-    lbl.append(el('b', null, fmt(dead)), document.createTextNode(' เคส คิดเป็นร้อยละ '), el('b', null, T ? d3.format('.2f')(dead / T * 100) : '—'));
-    db.replaceChildren(n, lbl);
-    $('zx-dead-note').textContent = 'ร้อยละคิดจากเคสทั้งหมด ' + fmt(T) + ' เคส · ' + dlabel(zone, sel) + (lf === 'all' ? '' : ' · ' + lf);
+    renderCprOutcome(cur);
     renderHosp(cur);
+  }
+
+  /* CPR x outcome: survival after CPR by method, and whether dead-at-scene cases got CPR */
+  const OUTS4 = [
+    ['alive', 'รอดชีวิต (มีบันทึกผล)', 'var(--o-alive)'],
+    ['blank', 'รอดชีวิต (ช่องผลว่าง)', 'var(--o-blank)'],
+    ['dead_tx', 'เสียชีวิตขณะนำส่ง', 'var(--o-tx)'],
+    ['dead', 'เสียชีวิต ณ จุดเกิดเหตุ', 'var(--o-dead)']
+  ];
+  const CPRDONE = ['CPR', 'CPR + AED/DF', 'AED/DF อย่างเดียว'];
+  const CPRNAME = { CPR: 'CPR อย่างเดียว', 'CPR + AED/DF': 'CPR + AED/DF', 'AED/DF อย่างเดียว': 'AED/DF อย่างเดียว' };
+  function renderCprOutcome(cur) {
+    const T = cur.total;
+    const co = (g, o) => trv(cur, 'cprout', g + '|' + o);
+    const grp = (g) => { const x = {}; OUTS4.forEach(([o]) => { x[o] = co(g, o); }); x.n = d3.sum(OUTS4, ([o]) => x[o]); return x; };
+    const done = CPRDONE.map((g) => [g, grp(g)]);
+    const sumK = (k) => d3.sum(done, (d) => d[1][k]);
+    const nCpr = sumK('n'), alive = sumK('alive') + sumK('blank'), blankC = sumK('blank'), deadC = sumK('dead');
+    const deadAll = trv(cur, 'care', DEAD);
+    const deadNo = deadAll - deadC;
+    const pct2 = (n, d) => (d ? d3.format('.2f')(n / d * 100) : '—');
+
+    const kpi = $('zx-cprkpi');
+    kpi.replaceChildren();
+    const tile = (cls, label, v, sub) => {
+      const k = el('div', 'k ' + cls);
+      k.append(el('span', 'l', label), el('span', 'v', v), el('span', 's', sub));
+      kpi.appendChild(k);
+    };
+    tile('', 'ทำ CPR หรือ AED/DF', fmt(nCpr), share(nCpr, T) + ' ของเคสทั้งหมด');
+    tile('alive', 'รอดชีวิตหลัง CPR', share(alive, nCpr), fmt(alive) + ' เคส · ช่องผลว่าง ' + fmt(blankC));
+    tile('dead', 'เสียชีวิต ณ จุดเกิดเหตุ', fmt(deadAll), 'ร้อยละ ' + pct2(deadAll, T) + ' ของเคสทั้งหมด');
+
+    legend($('zx-cpr-leg'), OUTS4.map(([, l, c]) => [l, c]));
+    const box = $('zx-cpr');
+    box.replaceChildren();
+    done.forEach(([g, x]) => {
+      const row = el('div', 'zx-orow');
+      const nm = el('span', 'nm', CPRNAME[g]);
+      nm.appendChild(el('small', null, fmt(x.n) + ' เคส'));
+      const bar = el('div', 'bar');
+      OUTS4.forEach(([o, , c]) => {
+        if (!x[o]) return;
+        const w = x[o] / x.n;
+        const sp = el('span', o === 'blank' ? 'lt' : null, w >= 0.12 ? pct(w) : '');
+        sp.style.width = (w * 100) + '%';
+        sp.style.background = c;
+        bar.appendChild(sp);
+      });
+      if (!x.n) bar.appendChild(el('span', 'lt', '—'));
+      const rs = el('span', 'rs');
+      rs.append(el('b', null, share(x.alive + x.blank, x.n)), el('small', null, 'รอดชีวิต'));
+      row.append(nm, bar, rs);
+      hover(row, CPRNAME[g] + ' · ' + fmt(x.n) + ' เคส', OUTS4.map(([o, l, c]) => [c, l + ': ' + fmt(x[o]) + ' (' + share(x[o], x.n) + ')']));
+      box.appendChild(row);
+    });
+
+    $('zx-dead-h').textContent = 'เสียชีวิต ณ จุดเกิดเหตุ ' + fmt(deadAll) + ' เคส ได้ทำ CPR หรือไม่';
+    const ds = $('zx-dead');
+    ds.replaceChildren();
+    const bar = el('div', 'bar');
+    const a = el('span', 'cpr', deadAll && deadC / deadAll >= 0.18 ? 'ทำ CPR/AED ' + fmt(deadC) : '');
+    a.style.width = (deadAll ? deadC / deadAll * 100 : 0) + '%';
+    const b = el('span', 'no', deadAll && deadNo / deadAll >= 0.18 ? 'ไม่ได้ทำ CPR ' + fmt(deadNo) : '');
+    b.style.width = (deadAll ? deadNo / deadAll * 100 : 0) + '%';
+    if (deadC) bar.appendChild(a);
+    if (deadNo) bar.appendChild(b);
+    hover(bar, 'เสียชีวิต ณ จุดเกิดเหตุ ' + fmt(deadAll) + ' เคส', [['color-mix(in srgb, var(--o-dead) 45%, var(--color-bg))', 'ทำ CPR/AED ก่อนลงเสียชีวิต: ' + fmt(deadC) + ' (' + share(deadC, deadAll) + ')'], ['var(--o-dead)', 'ไม่ได้ทำ CPR: ' + fmt(deadNo) + ' (' + share(deadNo, deadAll) + ')']]);
+    const cap = el('div', 'cap');
+    const c1 = el('span'); c1.append(document.createTextNode('ทำ CPR/AED แล้วเสียชีวิต '), el('b', null, fmt(deadC) + ' · ' + share(deadC, deadAll)));
+    const c2 = el('span'); c2.append(document.createTextNode('เสียชีวิตโดยไม่ได้ทำ CPR '), el('b', null, fmt(deadNo) + ' · ' + share(deadNo, deadAll)));
+    cap.append(c1, c2);
+    ds.append(bar, cap);
+    $('zx-cpr-note').textContent = 'รอดชีวิต = ไม่ได้ลงว่าเสียชีวิต (นับรวมเคสที่ช่องผลการดูแลเบื้องต้นว่าง) · เสียชีวิตขณะนำส่งแยกไว้ต่างหาก · ร้อยละในแถบคิดจากเคสที่ทำ CPR วิธีนั้น · ' + dlabel(zone, sel) + (lf === 'all' ? '' : ' · ' + lf);
   }
 
   const HCOLS = [['name', 'โรงพยาบาล'], ['Basic', 'Basic'], ['Advance', 'Advance'], ['อื่นๆ', 'อื่นๆ'], ['ไม่ระบุ', 'ไม่ระบุ'], ['total', 'รวม'], ['share', '% ของเคสที่นำส่ง']];
