@@ -30,6 +30,15 @@
   let groupOf = new Map();
   let zoneDists = new Map();
   let nMonths = 11;
+  let codeName = new Map();
+  const cname = (k) => { const m = /^(\d+)/.exec(k); return m ? codeName.get(m[1]) || '' : ''; };
+  const clabel = (k) => (cname(k) ? k + ' ' + cname(k) : k);
+  let ustats = [];
+  let hstats = [];
+  const picks = { unit: [], hosp: [] };
+  const LV7 = ['Basic', 'Advance', 'ML', 'CLS', 'FR', 'ERB', 'ไม่ระบุ'];
+  const LV7NAME = { Basic: 'BLS (Basic)', Advance: 'ALS (Advance)', ML: 'ML', CLS: 'CLS', FR: 'FR', ERB: 'ERB', 'ไม่ระบุ': 'ไม่ระบุระดับ' };
+  const LV7C = { Basic: 'var(--lv-basic)', Advance: 'var(--lv-adv)', ML: 'var(--lv-ml)', CLS: 'var(--lv-cls)', FR: 'var(--lv-fr)', ERB: 'var(--lv-erb)', 'ไม่ระบุ': 'var(--lv-unk)' };
 
   const C = () => ({ Basic: 'var(--lv-basic)', Advance: 'var(--lv-adv)', 'อื่นๆ': 'var(--lv-oth)', 'ไม่ระบุ': 'var(--lv-unk)' });
 
@@ -265,9 +274,9 @@
 
     const cg = {};
     G4.forEach((g) => { cg[g] = cohort(zone, sel, g); });
-    const tcs = (c) => top(c.tr.combo, 3).map((x) => x[0] + ' ' + fmt(x[1])).join(' · ') || '—';
+    const tcs = (c) => top(c.tr.combo, 3).map((x) => x[0] + ' (' + (cname(x[0]) || '—') + ') ' + fmt(x[1])).join(' · ') || '—';
     li('ชุดรหัสอาการ', ['ที่พบมากสุด Basic: ', { b: tcs(cg.Basic) }, ' · Advance: ', { b: tcs(cg.Advance) }],
-      'อ่านเช่น 25เหลือง1 = รหัส 25 สีเหลือง ระดับ 1');
+      'อ่านเช่น 25เหลือง1 = รหัส 25 (อุบัติเหตุยานยนต์) สีเหลือง ระดับ 1 · ดูนิยามรหัส 1–26 ในกล่องอ้างอิงท้ายหน้า');
     if (lf === 'all') {
       const tb = top(new Map([...cg.Basic.unit.values()].map((u) => [u.unit, u.total])), 2);
       const ta = top(new Map([...cg.Advance.unit.values()].map((u) => [u.unit, u.total])), 3);
@@ -304,11 +313,39 @@
       b.addEventListener('click', () => setLf(lf === g ? 'all' : g));
       box.appendChild(b);
     });
-    const sh = $('zx-share');
-    sh.replaceChildren();
-    partsOf(cnt).forEach((p) => {
-      const x = el('span'); x.style.width = (base.total ? p.v / base.total * 100 : 0) + '%'; x.style.background = p.c; sh.appendChild(x);
-      hover(x, p.k, [[p.c, fmt(p.v) + ' เคส (' + share(p.v, base.total) + ')']]);
+    const items = LV7.map((k) => ({ key: k, label: LV7NAME[k], v: base.lv[k] || 0, color: LV7C[k], on: lf !== 'all' && G4OF[k] === lf }));
+    const pick = (it) => setLf(lf === G4OF[it.key] ? 'all' : G4OF[it.key]);
+    drawDonut($('zx-pie'), items, base.total, 'เคสทั้งหมด', pick);
+    pieLegend($('zx-pie-leg'), items, base.total, pick);
+  }
+
+  /* donut chart: items [{key, label, v, color, on}] */
+  function drawDonut(box, items, total, caption, onPick) {
+    box.replaceChildren();
+    const S = 200, R = S / 2 - 2;
+    const svg = d3.select(box).append('svg').attr('width', '100%').attr('viewBox', '0 0 ' + S + ' ' + S);
+    const g = svg.append('g').attr('transform', 'translate(' + S / 2 + ',' + S / 2 + ')');
+    const data = items.filter((i) => i.v > 0);
+    const arcs = d3.pie().sort(null).value((d) => d.v).padAngle(0.008)(data);
+    const arc = d3.arc().innerRadius(R * 0.58).outerRadius(R);
+    const arcOn = d3.arc().innerRadius(R * 0.58).outerRadius(R + 2);
+    arcs.forEach((a) => {
+      const d = a.data;
+      const path = g.append('path').attr('d', (d.on ? arcOn : arc)(a)).style('fill', d.color).attr('class', d.on ? 'on' : null);
+      path.on('mouseenter', (e) => showTip(e, d.label, [[d.color, fmt(d.v) + ' เคส (' + share(d.v, total) + ')']])).on('mousemove', moveTip).on('mouseleave', hideTip);
+      if (onPick) path.on('click', () => { hideTip(); onPick(d); });
+    });
+    g.append('text').attr('text-anchor', 'middle').attr('y', 2).attr('font-size', 26).attr('font-weight', 700).style('fill', 'var(--color-fg)').text(fmt(total));
+    g.append('text').attr('text-anchor', 'middle').attr('y', 22).attr('font-size', 12).style('fill', 'var(--color-fg-muted)').text(caption);
+  }
+  function pieLegend(box, items, total, onPick) {
+    box.replaceChildren();
+    items.forEach((it) => {
+      const b = el(onPick ? 'button' : 'div', 'it' + (it.on ? ' on' : ''));
+      if (onPick) { b.type = 'button'; b.addEventListener('click', () => onPick(it)); }
+      const i = el('i'); i.style.background = it.color;
+      b.append(i, el('span', null, it.label), el('span', 'c', fmt(it.v)), el('span', 'p', share(it.v, total)));
+      box.appendChild(b);
     });
   }
 
@@ -335,7 +372,7 @@
     tb.replaceChildren();
     const frac = (c1, n) => share(n, c1.total);
     const topTxt = (map, c1, f) => { const t = top(map, 1)[0]; return t && c1.total ? f(t[0]) + ' · ' + pct(t[1] / c1.total) : '—'; };
-    const nth = (map, c1, i) => { const x = top(map, i + 1)[i]; return x && c1.total ? x[0] + ' · ' + pct(x[1] / c1.total) : '—'; };
+    const nth = (map, c1, i) => { const x = top(map, i + 1)[i]; return x && c1.total ? clabel(x[0]) + ' · ' + pct(x[1] / c1.total) : '—'; };
     const rows = [
       ['grp', 'ปริมาณ'],
       ['จำนวนเคส', (c1) => fmt(c1.total) + ' · ' + share(c1.total, base.total) + ' ของพื้นที่'],
@@ -411,18 +448,62 @@
       row.appendChild(cell(dead, share(dead, c1.total)));
       row.appendChild(cell(tp, share(tp, c1.total)));
       const x = top(c1.tr.combo, 1)[0];
-      row.appendChild(el('td', null, x && c1.total ? x[0] + ' · ' + pct(x[1] / c1.total) : '—'));
+      row.appendChild(el('td', null, x && c1.total ? clabel(x[0]) + ' · ' + pct(x[1] / c1.total) : '—'));
       row.addEventListener('click', fn);
       tb.appendChild(row);
     });
   }
 
   /* patients */
+  const MALE = 'M12 0.5a5 5 0 1 1 0 10a5 5 0 0 1 0-10zM6.5 12.5h11a2.5 2.5 0 0 1 2.5 2.5v13h-3.2v18.5h-4v-16h-1.6v16h-4V28H4V15a2.5 2.5 0 0 1 2.5-2.5z';
+  const FEMALE = 'M12 0.5a5 5 0 1 1 0 10a5 5 0 0 1 0-10zM8.5 12.5h7l6.5 19h-5v15h-3.4v-15h-1.2v15H9v-15H2z';
+  function person(shape, color) {
+    const NS = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(NS, 'svg');
+    svg.setAttribute('viewBox', '0 0 24 47');
+    svg.setAttribute('aria-hidden', 'true');
+    const p = document.createElementNS(NS, 'path');
+    p.setAttribute('d', shape);
+    p.style.fill = color;
+    svg.appendChild(p);
+    return svg;
+  }
+  /* split `slots` icons by largest remainder */
+  function iconCounts(vals, slots) {
+    const tot = d3.sum(vals) || 1;
+    const raw = vals.map((v) => v / tot * slots);
+    const out = raw.map(Math.floor);
+    let left = slots - d3.sum(out);
+    raw.map((r, i) => [r - Math.floor(r), i]).sort((x, y) => y[0] - x[0]).forEach(([, i]) => { if (left > 0) { out[i]++; left--; } });
+    return out;
+  }
   function renderPatients() {
     const cur = cohort(zone, sel, lf);
     const T = cur.total;
-    valRows($('zx-age'), AGES.map((a) => ({ label: AGEDEF[a], v: trv(cur, 'age', a), color: a === 'ไม่ระบุ' ? 'var(--lv-unk)' : null })), T);
-    valRows($('zx-sex'), SEXES.map((s) => ({ label: s, v: trv(cur, 'sex', s), color: s === 'ไม่ระบุ' ? 'var(--lv-unk)' : null })), T);
+    const ageItems = [['เด็ก', 'เด็ก 0–14 ปี', 'var(--ag-1)'], ['ผู้ใหญ่', 'ผู้ใหญ่ 15–59 ปี', 'var(--ag-2)'], ['ผู้สูงอายุ', 'ผู้สูงอายุ 60 ปีขึ้นไป', 'var(--ag-3)'], ['ไม่ระบุ', 'ไม่ระบุอายุ', 'var(--lv-unk)']]
+      .map(([k, label, color]) => ({ key: k, label, v: trv(cur, 'age', k), color }));
+    drawDonut($('zx-age'), ageItems, T, 'เคส', null);
+    pieLegend($('zx-age-leg'), ageItems, T, null);
+
+    const m = trv(cur, 'sex', 'ชาย'), f = trv(cur, 'sex', 'หญิง'), u = trv(cur, 'sex', 'ไม่ระบุ');
+    const st = $('zx-sexstat');
+    st.replaceChildren();
+    [['m', 'ชาย', m, MALE, 'var(--sx-m)'], ['f', 'หญิง', f, FEMALE, 'var(--sx-f)']].forEach(([c, name, v, shape, color]) => {
+      const d = el('div', 's ' + c);
+      const l = el('span', 'l');
+      const ic = person(shape, color); ic.style.width = '.7rem';
+      l.append(ic, document.createTextNode(name));
+      d.append(l, el('span', 'v', share(v, T)), el('span', 'n', fmt(v) + ' เคส'));
+      st.appendChild(d);
+    });
+    const counts = iconCounts([m, f, u], 20);
+    const pic = $('zx-sex');
+    pic.replaceChildren();
+    for (let i = 0; i < counts[0]; i++) pic.appendChild(person(MALE, 'var(--sx-m)'));
+    for (let i = 0; i < counts[1]; i++) pic.appendChild(person(FEMALE, 'var(--sx-f)'));
+    for (let i = 0; i < counts[2]; i++) pic.appendChild(person(i % 2 ? FEMALE : MALE, 'var(--lv-unk)'));
+    hover(pic, 'เพศผู้ป่วย', [['var(--sx-m)', 'ชาย ' + fmt(m) + ' (' + share(m, T) + ')'], ['var(--sx-f)', 'หญิง ' + fmt(f) + ' (' + share(f, T) + ')'], ['var(--lv-unk)', 'ไม่ระบุ ' + fmt(u) + ' (' + share(u, T) + ')']]);
+
     const cprKeys = CPRS.concat([...cur.tr.cpr.keys()].filter((k) => !CPRS.includes(k)).sort());
     const any = cprAny(cur);
     $('zx-cpr-note').textContent = 'ทำ CPR หรือ AED/DF รวม ' + fmt(any) + ' เคส (' + share(any, T) + ')';
@@ -430,14 +511,18 @@
 
     const dead = trv(cur, 'care', DEAD);
     const db = $('zx-dead');
-    db.replaceChildren(el('span', 'n', fmt(dead)), el('span', null, DEAD), el('span', 'p', share(dead, T) + ' ของเคส · ' + dlabel(zone, sel) + (lf === 'all' ? '' : ' · ' + lf)));
-    valRows($('zx-care'), top(cur.tr.care, 20).map((x) => ({ label: x[0], v: x[1], hot: x[0] === DEAD, color: x[0] === DEAD ? 'var(--lv-adv)' : x[0] === 'ไม่มีบันทึก' ? 'var(--lv-unk)' : null })), T);
+    const n = el('span', 'n', fmt(dead));
+    const lbl = el('span', null, 'จำนวน ');
+    lbl.append(el('b', null, fmt(dead)), document.createTextNode(' เคส คิดเป็นร้อยละ '), el('b', null, T ? d3.format('.2f')(dead / T * 100) : '—'));
+    db.replaceChildren(n, lbl);
+    $('zx-dead-note').textContent = 'ร้อยละคิดจากเคสทั้งหมด ' + fmt(T) + ' เคส · ' + dlabel(zone, sel) + (lf === 'all' ? '' : ' · ' + lf);
     renderHosp(cur);
   }
 
   const HCOLS = [['name', 'โรงพยาบาล'], ['Basic', 'Basic'], ['Advance', 'Advance'], ['อื่นๆ', 'อื่นๆ'], ['ไม่ระบุ', 'ไม่ระบุ'], ['total', 'รวม'], ['share', '% ของเคสที่นำส่ง']];
   function buildHospHead() {
     const tr = el('tr');
+    tr.appendChild(el('th', null, 'เทียบ'));
     HCOLS.forEach((c) => {
       const th = el('th');
       const b = el('button', null, c[1]);
@@ -453,7 +538,7 @@
   }
   function renderHosp(cur) {
     const cols = $('zx-hosp').tHead.rows[0].cells;
-    HCOLS.forEach((c, i) => cols[i].setAttribute('aria-sort', hsort.k === c[0] ? (hsort.dir > 0 ? 'ascending' : 'descending') : 'none'));
+    HCOLS.forEach((c, i) => cols[i + 1].setAttribute('aria-sort', hsort.k === c[0] ? (hsort.dir > 0 ? 'ascending' : 'descending') : 'none'));
     const tp = transported(cur);
     let hs = [...cur.hosp.entries()].filter((e) => e[0] !== NOHOSP).map((e) => Object.assign({ name: e[0], share: tp ? e[1].total / tp : 0 }, e[1]));
     const nh = hs.length;
@@ -467,7 +552,10 @@
     const tb = $('zx-hosp').tBodies[0];
     tb.replaceChildren();
     const addRow = (h, cls, shareTxt) => {
-      const tr = el('tr', cls);
+      const tr = el('tr', cls || (picks.hosp.includes(h.name) ? 'picked' : null));
+      const pc = el('td');
+      if (!cls) pc.appendChild(pickBtn('hosp', h.name));
+      tr.appendChild(pc);
       tr.appendChild(el('td', null, h.name));
       G4.concat(['total']).forEach((k) => tr.appendChild(el('td', h[k] ? null : 'z', fmt(h[k] || 0))));
       tr.appendChild(el('td', null, shareTxt));
@@ -475,6 +563,7 @@
     };
     hs.forEach((h) => addRow(h, null, pct(h.share)));
     if (none && !q) addRow(Object.assign({ name: NOHOSP }, none), 'none', share(none.total, cur.total) + ' ของเคสทั้งหมด');
+    renderPairs('hosp');
     $('zx-hosp-note').textContent = fmt(nh) + ' โรงพยาบาล · นำส่ง ' + fmt(tp) + ' จาก ' + fmt(cur.total) + ' เคส (' + share(tp, cur.total) + ')' + (q ? ' · แสดง ' + fmt(hs.length) + ' ที่ตรงกับคำค้น' : '');
   }
 
@@ -482,8 +571,8 @@
   function renderTraits() {
     const cur = cohort(zone, sel, lf);
     const scope = dlabel(zone, sel) + (lf === 'all' ? '' : ' · ' + lf);
-    $('zx-combo-note').textContent = scope + ' · 15 ชุดแรก · อ่านเช่น 25แดง2 = รหัส 25 สีแดง ระดับ 2';
-    valRows($('zx-combo'), top(cur.tr.combo, 15).map((x) => ({ label: x[0], v: x[1] })), cur.total);
+    $('zx-combo-note').textContent = scope + ' · 15 ชุดแรก · อ่านเช่น 25แดง2 = รหัส 25 (อุบัติเหตุยานยนต์) สีแดง ระดับ 2';
+    valRows($('zx-combo'), top(cur.tr.combo, 15).map((x) => ({ label: clabel(x[0]), v: x[1] })), cur.total);
     valRows($('zx-dow'), DOW.map((n, i) => ({ label: n, v: cur.tr.dow.get(String(i)) || 0 })), cur.total);
     valRows($('zx-tam'), top(cur.tr.tambon, 10).map((x) => ({ label: x[0], v: x[1] })), cur.total);
     $('zx-lvc-note').textContent = dlabel(zone, sel) + ' · 6 ชุดแรกของแต่ละระดับ · เปอร์เซ็นต์คิดจากเคสของระดับนั้น';
@@ -499,7 +588,7 @@
       const rows = el('div', 'zx-rows');
       col.appendChild(rows);
       lb.appendChild(col);
-      valRows(rows, top(c1.tr.combo, 6).map((x) => ({ label: x[0], v: x[1], color: C()[g] })), c1.total);
+      valRows(rows, top(c1.tr.combo, 6).map((x) => ({ label: x[0], tip: clabel(x[0]), v: x[1], color: C()[g] })), c1.total);
     });
     drawHours(cur);
   }
@@ -589,6 +678,7 @@
   const COLS = [['unit', 'หน่วย'], ['group', 'กลุ่ม'], ['Basic', 'Basic'], ['Advance', 'Advance'], ['ML', 'ML'], ['CLS', 'CLS'], ['FR', 'FR'], ['ERB', 'ERB'], ['ไม่ระบุ', 'ไม่ระบุ'], ['total', 'รวม']];
   function buildHead() {
     const tr = el('tr');
+    tr.appendChild(el('th', null, 'เทียบ'));
     COLS.forEach((c) => {
       const th = el('th');
       const b = el('button', null, c[1]);
@@ -606,7 +696,7 @@
   function renderTable() {
     const cur = cohort(zone, sel, lf);
     const cols = $('zx-table').tHead.rows[0].cells;
-    COLS.forEach((c, i) => cols[i].setAttribute('aria-sort', sort.k === c[0] ? (sort.dir > 0 ? 'ascending' : 'descending') : 'none'));
+    COLS.forEach((c, i) => cols[i + 1].setAttribute('aria-sort', sort.k === c[0] ? (sort.dir > 0 ? 'ascending' : 'descending') : 'none'));
     let us = [...cur.unit.values()].map((u) => ({ unit: u.unit, group: u.group, total: u.total, Basic: u.lv.Basic || 0, Advance: u.lv.Advance || 0, ML: u.lv.ML || 0, CLS: u.lv.CLS || 0, FR: u.lv.FR || 0, ERB: u.lv.ERB || 0, 'ไม่ระบุ': u.lv['ไม่ระบุ'] || 0 }));
     const q = query.trim().toLowerCase();
     if (q) us = us.filter((u) => u.unit.toLowerCase().includes(q));
@@ -618,7 +708,8 @@
     const tb = $('zx-table').tBodies[0];
     tb.replaceChildren();
     us.forEach((u) => {
-      const tr = el('tr');
+      const tr = el('tr', picks.unit.includes(u.unit) ? 'picked' : null);
+      const pc = el('td'); pc.appendChild(pickBtn('unit', u.unit)); tr.appendChild(pc);
       COLS.forEach((c) => {
         const v = u[c[0]];
         tr.appendChild(el('td', typeof v === 'number' && v === 0 ? 'z' : null, typeof v === 'number' ? fmt(v) : short(v)));
@@ -626,7 +717,118 @@
       const td = el('td'); const bar = el('span', 'bar'); bar.style.width = (u.total / max * 100) + '%'; td.appendChild(bar); td.style.minWidth = '7rem'; tr.appendChild(td);
       tb.appendChild(tr);
     });
+    renderPairs('unit');
     $('zx-tbl-note').textContent = fmt(us.length) + ' หน่วย' + (q ? ' ที่ตรงกับคำค้น' : '') + ' · ' + dlabel(zone, sel) + (lf === 'all' ? '' : ' · ' + lf);
+  }
+
+  /* pair benchmark: up to 2 pairs (4 picks) of units or hospitals */
+  const SLOT = ['A1', 'B1', 'A2', 'B2'];
+  function pickBtn(kind, name) {
+    const i = picks[kind].indexOf(name);
+    const b = el('button', 'zx-pick ' + (i % 2 ? 'sb' : 'sa'), i >= 0 ? SLOT[i] : '＋');
+    b.type = 'button';
+    b.setAttribute('aria-pressed', String(i >= 0));
+    b.setAttribute('aria-label', (i >= 0 ? 'เอาออกจากการเทียบ: ' : 'เลือกมาเทียบ: ') + name);
+    b.disabled = i < 0 && picks[kind].length >= 4;
+    b.addEventListener('click', () => togglePick(kind, name));
+    return b;
+  }
+  function togglePick(kind, name) {
+    const p = picks[kind];
+    const i = p.indexOf(name);
+    if (i >= 0) p.splice(i, 1); else if (p.length < 4) p.push(name);
+    if (kind === 'unit') renderTable(); else renderHosp(cohort(zone, sel, lf));
+  }
+  function scopedStats(rows, key) {
+    const m = new Map();
+    rows.forEach((r) => {
+      if (!inScope(r, zone, sel)) return;
+      if (lf !== 'all' && G4OF[r.level] !== lf) return;
+      let x = m.get(r[key]);
+      if (!x) { x = { n: 0, adv: 0, found: 0, transported: 0, old: 0, cpr: 0, dead: 0, red: 0, erawan: 0 }; m.set(r[key], x); }
+      ['n', 'found', 'transported', 'old', 'cpr', 'dead', 'red', 'erawan'].forEach((k) => { x[k] += +r[k] || 0; });
+      if (r.level === 'Advance') x.adv += +r.n;
+    });
+    return m;
+  }
+  const rate = (x, k) => (x.n ? x[k] / x.n : 0);
+  const METRICS = {
+    unit: [
+      ['เคสที่ออก', (x) => x.n, 'n'],
+      ['สัดส่วน ALS', (x) => rate(x, 'adv'), 'p'],
+      ['พบเหตุ', (x) => rate(x, 'found'), 'p'],
+      ['นำส่งห้องฉุกเฉิน', (x) => rate(x, 'transported'), 'p'],
+      ['ผู้ป่วยสูงอายุ', (x) => rate(x, 'old'), 'p'],
+      ['รหัสสีแดง', (x) => rate(x, 'red'), 'p'],
+      ['ทำ CPR/AED (เคส)', (x) => x.cpr, 'n'],
+      ['เสียชีวิต ณ จุดเกิดเหตุ (เคส)', (x) => x.dead, 'n']
+    ],
+    hosp: [
+      ['เคสที่รับ', (x) => x.n, 'n'],
+      ['ส่วนแบ่งของเคสที่นำส่ง', (x) => x.shareAll, 'p'],
+      ['มาจากหน่วย ALS', (x) => rate(x, 'adv'), 'p'],
+      ['ผู้ป่วยสูงอายุ', (x) => rate(x, 'old'), 'p'],
+      ['รหัสสีแดง', (x) => rate(x, 'red'), 'p'],
+      ['ทำ CPR/AED (เคส)', (x) => x.cpr, 'n'],
+      ['ส่งโดยศูนย์เอราวัณ', (x) => rate(x, 'erawan'), 'p']
+    ]
+  };
+  function renderPairs(kind) {
+    const box = $(kind === 'unit' ? 'zx-ucmp' : 'zx-hcmp');
+    box.replaceChildren();
+    const p = picks[kind];
+    const noun = kind === 'unit' ? 'หน่วย' : 'โรงพยาบาล';
+    const hint = el('div', 'zx-cmphint');
+    hint.appendChild(el('span', null, p.length
+      ? 'เทียบ ' + fmt(p.length) + ' ' + noun + ' · ' + dlabel(zone, sel) + (lf === 'all' ? '' : ' · ' + lf) + (p.length < 4 ? ' · กด ＋ เพื่อเลือกเพิ่ม (สูงสุด 2 คู่)' : '')
+      : 'Benchmark: กด ＋ หน้า' + noun + 'ในตารางเพื่อจับคู่เทียบกัน เลือกได้สูงสุด 2 คู่ (4 ' + noun + ') ตัวที่ 1–2 เป็นคู่แรก ตัวที่ 3–4 เป็นคู่ที่สอง'));
+    if (p.length) {
+      const clr = el('button', null, 'ล้างการเลือก');
+      clr.type = 'button';
+      clr.addEventListener('click', () => { picks[kind] = []; if (kind === 'unit') renderTable(); else renderHosp(cohort(zone, sel, lf)); });
+      hint.appendChild(clr);
+    }
+    box.appendChild(hint);
+    if (!p.length) return;
+    const stats = kind === 'unit' ? scopedStats(ustats, 'unit') : scopedStats(hstats, 'hosp');
+    if (kind === 'hosp') { const tot = d3.sum([...stats.values()], (x) => x.n); stats.forEach((x) => { x.shareAll = tot ? x.n / tot : 0; }); }
+    const zero = { n: 0, adv: 0, found: 0, transported: 0, old: 0, cpr: 0, dead: 0, red: 0, erawan: 0, shareAll: 0 };
+    const nm = (s) => (kind === 'unit' ? short(s) : s);
+    const pairs = el('div', 'zx-pairs');
+    for (let k = 0; k < p.length; k += 2) {
+      const A = p[k], B = p[k + 1];
+      const xa = stats.get(A) || zero, xb = B ? (stats.get(B) || zero) : null;
+      const card = el('div', 'zx-pair');
+      const hd = el('div', 'hd');
+      hd.append(el('span', 'a', SLOT[k] + ' · ' + nm(A)), el('span', 'vs', 'vs'), B ? el('span', 'b', nm(B) + ' · ' + SLOT[k + 1]) : el('span', 'wait', 'เลือกอีก 1 ' + noun));
+      card.appendChild(hd);
+      METRICS[kind].forEach(([label, f, t]) => {
+        const va = f(xa), vb = xb ? f(xb) : null;
+        const max = t === 'p' ? 1 : Math.max(va, vb || 0, 1);
+        const txt = (v) => (v == null ? '—' : t === 'p' ? pct(v) : fmt(v));
+        const row = el('div', 'zx-bf');
+        const side = (cls, v, win) => {
+          const s1 = el('div', 'side ' + cls);
+          const tr = el('div', 't'); const sp = el('span'); sp.style.width = (v == null ? 0 : v / max * 100) + '%'; tr.appendChild(sp);
+          s1.append(tr, el('span', 'v' + (win ? ' win' : ''), txt(v)));
+          return s1;
+        };
+        row.append(side('a', va, vb != null && va > vb), el('span', 'm', label), side('b', vb, vb != null && vb > va));
+        card.appendChild(row);
+      });
+      pairs.appendChild(card);
+    }
+    box.appendChild(pairs);
+  }
+
+  function renderCodes() {
+    const tb = $('zx-codes').tBodies[0];
+    if (tb.rows.length) return;
+    [...codeName.entries()].sort((a, b) => +a[0] - +b[0]).forEach(([c, n]) => {
+      const tr = el('tr');
+      tr.append(el('td', null, c), el('td', null, n));
+      tb.appendChild(tr);
+    });
   }
 
   function renderFlow() {
@@ -647,7 +849,7 @@
   function setLf(g) { lf = g; draw(); }
 
   function draw() {
-    const ds = ['cases', 'traits', 'units', 'zones'].map((k) => dash.data(k));
+    const ds = ['cases', 'traits', 'units', 'zones', 'unitstats', 'hospstats', 'codes'].map((k) => dash.data(k));
     const err = $('zx-err');
     if (ds.some((d) => d.status !== 'ok')) {
       err.hidden = ds.some((d) => d.status === 'loading');
@@ -657,6 +859,9 @@
     cases = ds[0].data;
     traits = ds[1].data;
     groupOf = new Map(ds[2].data.map((r) => [r.unit, r.group]));
+    codeName = new Map(ds[6].data.map((r) => [String(r.code), r.name]));
+    ustats = ds[4].data;
+    hstats = ds[5].data;
     zoneDists = new Map();
     ds[3].data.forEach((r) => {
       const z = +r.zone;
@@ -680,6 +885,7 @@
     renderMonthly();
     renderTable();
     renderFlow();
+    renderCodes();
   }
 
   buildHead();

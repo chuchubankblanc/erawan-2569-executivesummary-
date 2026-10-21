@@ -36,9 +36,10 @@
 
       <div class="zx-heroarea zx-c5" id="zx-hero-box" data-source="cases">
         <div class="zx-hero" id="zx-hero"></div>
-        <div class="zx-sharebox">
-          <div class="zx-share" id="zx-share" role="img" aria-label="สัดส่วนเคสแยกตามระดับหน่วย"></div>
-          <p class="zx-note">กดที่ช่องเพื่อดูเฉพาะระดับนั้น · 1 เลขปฏิบัติการ = 1 เคส</p>
+        <div class="zx-sharebox zx-piebox" id="zx-pie-box" data-source="cases">
+          <div class="zx-pie" id="zx-pie" role="img" aria-label="สัดส่วนเคสแยกตามระดับหน่วยที่จัด"></div>
+          <div class="zx-pieleg" id="zx-pie-leg"></div>
+          <p class="zx-note">สัดส่วนตามระดับหน่วยที่จัด · กดชิ้นหรือรายการเพื่อดูเฉพาะกลุ่มนั้น · 1 เลขปฏิบัติการ = 1 เคส</p>
         </div>
       </div>
     </div>
@@ -63,38 +64,38 @@
 
     <p class="zx-sec">ผู้ป่วยและการนำส่ง <small>อายุ เพศ CPR ผลการดูแลเบื้องต้น โรงพยาบาลปลายทาง</small></p>
     <div class="zx-grid">
-      <section class="zx-box zx-t2 zx-c4" id="zx-age-box" data-source="traits" aria-labelledby="zx-age-h">
+      <section class="zx-box zx-t2 zx-c3" id="zx-age-box" data-source="traits" aria-labelledby="zx-age-h">
         <span class="zx-role">ตัวชี้วัดหลัก</span>
         <h2 id="zx-age-h">กลุ่มอายุผู้ป่วย</h2>
-        <ul class="zx-defs" aria-label="นิยามกลุ่มอายุ">
-          <li><b>เด็ก</b> 0–14 ปี</li>
-          <li><b>ผู้ใหญ่</b> 15–59 ปี</li>
-          <li><b>ผู้สูงอายุ</b> 60 ปีขึ้นไป</li>
-          <li><b>ไม่ระบุ</b> อายุ 0 หรือว่าง</li>
-        </ul>
-        <div class="zx-rows" id="zx-age"></div>
+        <div class="zx-donutrow">
+          <div class="zx-pie sm" id="zx-age" role="img" aria-label="สัดส่วนกลุ่มอายุผู้ป่วย"></div>
+          <div class="zx-pieleg" id="zx-age-leg"></div>
+        </div>
+        <p class="zx-note">เด็ก 0–14 ปี · ผู้ใหญ่ 15–59 ปี · ผู้สูงอายุ 60 ปีขึ้นไป · อายุ 0 หรือว่าง = ไม่ระบุ</p>
       </section>
-      <section class="zx-box zx-t2 zx-c4" id="zx-sex-box" data-source="traits" aria-labelledby="zx-sex-h">
+      <section class="zx-box zx-t2 zx-c3" id="zx-sex-box" data-source="traits" aria-labelledby="zx-sex-h">
         <span class="zx-role">ตัวชี้วัดหลัก</span>
         <h2 id="zx-sex-h">เพศผู้ป่วย</h2>
-        <p class="zx-note">ค่า 0 หรือว่างในไฟล์ นับเป็น “ไม่ระบุ”</p>
-        <div class="zx-rows" id="zx-sex"></div>
+        <div class="zx-sexstat" id="zx-sexstat"></div>
+        <div class="zx-picto" id="zx-sex" role="img" aria-label="สัดส่วนเพศผู้ป่วย 1 รูปคนเท่ากับ 5% ของเคส"></div>
+        <p class="zx-note">1 รูปคน = 5% ของเคส · ค่า 0 หรือว่างในไฟล์ นับเป็น “ไม่ระบุ”</p>
       </section>
-      <section class="zx-box zx-t2 zx-c4" id="zx-cpr-box" data-source="traits" aria-labelledby="zx-cpr-h">
+      <section class="zx-box zx-t2 zx-c3" id="zx-cpr-box" data-source="traits" aria-labelledby="zx-cpr-h">
         <span class="zx-role">ตัวชี้วัดหลัก</span>
         <h2 id="zx-cpr-h">การทำ CPR</h2>
         <p class="zx-note" id="zx-cpr-note"></p>
         <div class="zx-rows" id="zx-cpr"></div>
       </section>
-      <section class="zx-box zx-t2 zx-c5" id="zx-care-box" data-source="traits" aria-labelledby="zx-care-h">
+      <section class="zx-box zx-t2 zx-c3 zx-deadbox" id="zx-care-box" data-source="traits" aria-labelledby="zx-care-h">
         <span class="zx-role">ตัวชี้วัดหลัก</span>
-        <h2 id="zx-care-h">ผลการดูแลรักษาเบื้องต้น</h2>
+        <h2 id="zx-care-h">เสียชีวิต ณ จุดเกิดเหตุ</h2>
         <div class="zx-dead" id="zx-dead"></div>
-        <div class="zx-rows" id="zx-care"></div>
+        <p class="zx-note" id="zx-dead-note"></p>
       </section>
-      <section class="zx-box zx-t2 zx-c7" id="zx-hosp-box" data-source="traits" aria-labelledby="zx-hosp-h">
+      <section class="zx-box zx-t2 zx-c12" id="zx-hosp-box" data-source="hospstats traits" aria-labelledby="zx-hosp-h">
         <span class="zx-role">ตัวชี้วัดหลัก</span>
         <h2 id="zx-hosp-h">โรงพยาบาลปลายทาง (นำส่งห้องฉุกเฉิน)</h2>
+        <div class="zx-cmpwrap" id="zx-hcmp"></div>
         <div class="zx-tools">
           <input id="zx-hq" type="search" placeholder="ค้นหาชื่อโรงพยาบาล" aria-label="ค้นหาชื่อโรงพยาบาล">
           <span class="zx-note" id="zx-hosp-note"></span>
@@ -109,7 +110,7 @@
         <span class="zx-role">บริบท</span>
         <h2 id="zx-combo-h">ชุดรหัสอาการ (รหัส-สี-ระดับ)</h2>
         <p class="zx-note" id="zx-combo-note"></p>
-        <div class="zx-rows" id="zx-combo"></div>
+        <div class="zx-rows wide" id="zx-combo"></div>
       </section>
       <section class="zx-box zx-t3 zx-tr zx-c6" id="zx-lvc-box" data-source="traits" aria-labelledby="zx-lvc-h">
         <span class="zx-role">บริบท</span>
@@ -164,9 +165,10 @@
         <div class="zx-legend" id="zx-leg3"></div>
         <div class="zx-chart" id="zx-month"></div>
       </section>
-      <section class="zx-box zx-t2 zx-c12" id="zx-tbl-box" data-source="cases units" aria-labelledby="zx-tbl-h">
+      <section class="zx-box zx-t2 zx-c12" id="zx-tbl-box" data-source="cases units unitstats" aria-labelledby="zx-tbl-h">
         <span class="zx-role">ตัวชี้วัดหลัก</span>
         <h2 id="zx-tbl-h">รายชื่อหน่วยที่ออกปฏิบัติการทั้งหมด</h2>
+        <div class="zx-cmpwrap" id="zx-ucmp"></div>
         <div class="zx-tools">
           <input id="zx-q" type="search" placeholder="ค้นหาชื่อหน่วย" aria-label="ค้นหาชื่อหน่วย">
           <span class="zx-note" id="zx-tbl-note"></span>
@@ -183,6 +185,15 @@
         </div>
       </details>
 
+      <details class="zx-box zx-t4 zx-c4" id="zx-codes-box" data-source="codes">
+        <summary>นิยามรหัสอาการ 1–26</summary>
+        <span class="zx-role">อ้างอิง</span>
+        <div class="zx-body">
+          <p>ชุดรหัสอาการ = รหัส (คอลัมน์ L) + สี (M) + ระดับ (N) เช่น 25เหลือง1 = รหัส 25 อุบัติเหตุยานยนต์ สีเหลือง ระดับ 1</p>
+          <table id="zx-codes"><tbody></tbody></table>
+        </div>
+      </details>
+
       <details class="zx-box zx-t4 zx-c4">
         <summary>นิยามตัวชี้วัด</summary>
         <span class="zx-role">อ้างอิง</span>
@@ -191,11 +202,11 @@
             <dt>Basic / Advance</dt><dd>คอลัมน์ จัดหน่วยบริการระดับ = BLS / ALS</dd>
             <dt>อื่นๆ</dt><dd>ML, CLS, FR และ ERB รวมกัน แสดงรายตัวในตารางหน่วย</dd>
             <dt>ไม่ระบุ</dt><dd>เคสที่คอลัมน์ระดับหน่วยว่าง</dd>
-            <dt>ชุดรหัสอาการ</dt><dd>รวมคอลัมน์ L รหัส + M สี + N ระดับ เป็นชุดเดียว เช่น 25แดง2 = รหัส 25 สีแดง ระดับ 2 ถ้าขาดตัวใดตัวหนึ่งนับเป็น “ไม่ระบุ”</dd>
+            <dt>ชุดรหัสอาการ</dt><dd>รวมคอลัมน์ L รหัส + M สี + N ระดับ เป็นชุดเดียว เช่น 25แดง2 = รหัส 25 (อุบัติเหตุยานยนต์) สีแดง ระดับ 2 ถ้าขาดตัวใดตัวหนึ่งนับเป็น “ไม่ระบุ” ชื่ออาการดูในกล่อง “นิยามรหัสอาการ 1–26”</dd>
             <dt>กลุ่มอายุ (คอลัมน์ Q)</dt><dd>เด็ก 0–14 ปี · ผู้ใหญ่ 15–59 ปี · ผู้สูงอายุ 60 ปีขึ้นไป · อายุ 0 หรือว่าง = ไม่ระบุ</dd>
             <dt>เพศ (คอลัมน์ R)</dt><dd>ชาย / หญิง ตามที่บันทึก ค่า 0 หรือว่าง = ไม่ระบุ</dd>
             <dt>การทำ CPR (คอลัมน์ S)</dt><dd>Yes = CPR · Yes,AED/DF = CPR + AED/DF · AED/DF = AED/DF อย่างเดียว · No = ไม่ได้ทำ</dd>
-            <dt>ผลการดูแลรักษาเบื้องต้น (คอลัมน์ T)</dt><dd>แจกแจงตามที่บันทึก รวมถึง “เสียชีวิต ณ จุดเกิดเหตุ” ค่าว่าง = ไม่มีบันทึก</dd>
+            <dt>เสียชีวิต ณ จุดเกิดเหตุ (คอลัมน์ T)</dt><dd>เคสที่ผลการดูแลรักษาเบื้องต้นบันทึกว่า “เสียชีวิต ณ จุดเกิดเหตุ” ร้อยละคิดจากเคสทั้งหมดในพื้นที่ที่เลือก (ไม่รวม “เสียชีวิตขณะนำส่ง”)</dd>
             <dt>โรงพยาบาลปลายทาง (คอลัมน์ U)</dt><dd>ชื่อห้องฉุกเฉินที่นำส่ง ค่า 0 หรือว่าง = ไม่ได้นำส่ง / ไม่มีบันทึก</dd>
             <dt>เขต</dt><dd>เขตที่เกิดเหตุ ไม่ใช่เขตที่ตั้งของหน่วย</dd>
           </dl>
@@ -210,7 +221,7 @@
           <p>“ไม่ได้นำส่ง / ไม่มีบันทึก” รวมทั้งเคสที่ไม่ได้นำส่งจริงและเคสที่ไม่ได้กรอกชื่อโรงพยาบาล แยกจากกันไม่ได้ในไฟล์นี้</p>
           <p>เขตจตุจักร บางกอกใหญ่ บางซื่อ บางบอน วังทองหลาง อยู่สองโซน แต่ละโซนนับเฉพาะแขวงของตัวเอง</p>
           <p>กลุ่มหน่วย (เอราวัณ / โรงพยาบาล / มูลนิธิและกู้ชีพ) จัดจากชื่อหน่วย ไม่มีคอลัมน์นี้ในไฟล์</p>
-          <p>ไฟล์ไม่มีชื่ออาการของแต่ละรหัส และไม่มีชื่อหรือเลขประจำตัวผู้ป่วย</p>
+          <p>ชื่ออาการของรหัส 1–26 มาจากรายการรหัสที่ศูนย์เอราวัณให้มา ไฟล์ไม่มีชื่อหรือเลขประจำตัวผู้ป่วย</p>
         </div>
       </details>
     </div>

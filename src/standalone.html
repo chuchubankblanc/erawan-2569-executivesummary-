@@ -49,7 +49,7 @@ img { max-width: 100%; }
 <script>
 /* minimal stand-in for the Claude Dashboard `dash` API: loads data/<id>.json */
 (function () {
-  const ids = ['cases', 'traits', 'units', 'zones', 'screening'];
+  const ids = ['cases', 'traits', 'units', 'zones', 'screening', 'unitstats', 'hospstats', 'codes'];
   const state = {};
   const subs = [];
   const fire = () => subs.forEach((fn) => fn());

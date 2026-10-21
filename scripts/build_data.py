@@ -177,6 +177,10 @@ def main():
     steps.append({'step': 'เคสที่ใช้วิเคราะห์', 'n': len(df), 'kind': 'final'})
 
     cases, traits, units = Counter(), Counter(), {}
+    UMET = ('n', 'found', 'transported', 'old', 'cpr', 'dead', 'red')
+    HMET = ('n', 'old', 'cpr', 'red', 'erawan')
+    ustats = defaultdict(lambda: dict.fromkeys(UMET, 0))
+    hstats = defaultdict(lambda: dict.fromkeys(HMET, 0))
     oddity = Counter()
     for r in df.to_dict('records'):
         z, d = r['zone'], clean(r['amphoe']).removeprefix('เขต')
@@ -209,6 +213,17 @@ def main():
             oddity['อายุไม่ใช่ตัวเลข (นับเป็นไม่ระบุ)'] += 1
         for k, v in dims.items():
             traits[(z, d, lv, k, v)] += 1
+        # ตัวชี้วัดสำหรับ benchmark รายหน่วย / รายโรงพยาบาล
+        flags = {'n': 1, 'found': dims['outcome'] == 'พบเหตุ', 'transported': dims['hosp'] != 'ไม่ได้นำส่ง / ไม่มีบันทึก',
+                 'old': dims['age'] == 'ผู้สูงอายุ', 'cpr': cpr in ('CPR', 'CPR + AED/DF', 'AED/DF อย่างเดียว'),
+                 'dead': dims['care'] == 'เสียชีวิต ณ จุดเกิดเหตุ', 'red': clean(r['color']) == 'แดง', 'erawan': ERAWAN in u}
+        us = ustats[(z, d, lv, u)]
+        for k in UMET:
+            us[k] += int(flags[k])
+        if flags['transported']:
+            hs = hstats[(z, d, lv, dims['hosp'])]
+            for k in HMET:
+                hs[k] += int(flags[k])
 
     def dump(name, obj):
         (out / name).write_text(json.dumps(obj, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
@@ -217,6 +232,10 @@ def main():
                         for (z, d, m, lv, u), n in sorted(cases.items())])
     dump('traits.json', [{'zone': z, 'district': d, 'level': lv, 'dim': k, 'key': v, 'n': n}
                          for (z, d, lv, k, v), n in sorted(traits.items())])
+    dump('unitstats.json', [dict(zone=z, district=d, level=lv, unit=u, **m) for (z, d, lv, u), m in sorted(ustats.items())])
+    dump('hospstats.json', [dict(zone=z, district=d, level=lv, hosp=h, **m) for (z, d, lv, h), m in sorted(hstats.items())])
+    with open(ROOT / 'config' / 'symptom_codes.csv', encoding='utf-8-sig') as f:
+        dump('codes.json', [{'code': r['code'], 'name': r['name']} for r in csv.DictReader(f)])
     dump('units.json', [{'unit': u, 'group': g} for u, g in sorted(units.items())])
     dump('screening.json', steps)
     dump('zones.json', [{'zone': z, 'district': e['district'], 'tambons': '' if e['tambons'] is None else ', '.join(e['tambons'])}
