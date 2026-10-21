@@ -1,0 +1,7 @@
+# ไฟล์ดิบห้าม commit
+*.xlsx
+*.xlsb
+*.zip
+raw/
+build/
+__pycache__/

@@ -1,0 +1,220 @@
+<div class="zx" id="zx">
+  <aside class="zx-side" aria-label="เลือกโซน เขต และระดับหน่วย">
+    <div class="zx-brand">การออกเหตุรายโซน<small>ศูนย์เอราวัณ · กรุงเทพมหานคร 11 โซน</small></div>
+    <div>
+      <p class="zx-lab">โซน</p>
+      <div class="zx-zonesel" id="zx-zones" data-source="cases"></div>
+    </div>
+    <div id="zx-dist-wrap">
+      <p class="zx-lab" id="zx-dist-lab">เขต</p>
+      <div class="zx-list wrapx" id="zx-dists" data-source="cases zones"></div>
+    </div>
+    <div>
+      <p class="zx-lab">ระดับหน่วยที่ออก</p>
+      <div class="zx-list wrapx" id="zx-lvls" data-source="cases"></div>
+    </div>
+    <div class="zx-foot" id="zx-foot" data-source="cases"></div>
+  </aside>
+
+  <main class="zx-main">
+    <header class="zx-report">
+      <img class="zx-logo" src="{{LOGO}}" alt="ตราศูนย์บริการการแพทย์ฉุกเฉินกรุงเทพมหานคร (ศูนย์เอราวัณ)" width="104" height="111">
+      <h1>รายงาน Executive Summary การนำส่งผู้ป่วยโดยระบบบริการการแพทย์ฉุกเฉิน ศูนย์เอราวัณ 1669<span>ประจำปีงบประมาณ 2569 (ตุลาคม 2568 - กันยายน 2569)</span></h1>
+      <p id="zx-range" data-source="cases">—</p>
+    </header>
+    <header class="zx-head">
+      <h2 id="zx-title">—</h2>
+      <p id="zx-sub" data-source="cases">—</p>
+    </header>
+
+    <div class="zx-grid">
+      <section class="zx-box zx-t1 zx-c7" id="zx-summary-box" data-source="cases traits units" aria-labelledby="zx-sum-h">
+        <span class="zx-role">สรุปผู้บริหาร</span>
+        <h2 id="zx-sum-h">ภาพรวมสำหรับผู้บริหาร</h2>
+        <ul class="zx-sum" id="zx-sum"></ul>
+      </section>
+
+      <div class="zx-heroarea zx-c5" id="zx-hero-box" data-source="cases">
+        <div class="zx-hero" id="zx-hero"></div>
+        <div class="zx-sharebox">
+          <div class="zx-share" id="zx-share" role="img" aria-label="สัดส่วนเคสแยกตามระดับหน่วย"></div>
+          <p class="zx-note">กดที่ช่องเพื่อดูเฉพาะระดับนั้น · 1 เลขปฏิบัติการ = 1 เคส</p>
+        </div>
+      </div>
+    </div>
+
+    <p class="zx-sec">เทียบระดับหน่วยและเทียบพื้นที่ <small>benchmark</small></p>
+    <div class="zx-grid">
+      <section class="zx-box zx-t2 zx-c12" id="zx-bm-box" data-source="cases traits" aria-labelledby="zx-bm-h">
+        <span class="zx-role">ตัวชี้วัดหลัก</span>
+        <h2 id="zx-bm-h">เทียบ Basic · Advance · อื่นๆ · ไม่ระบุ</h2>
+        <p class="zx-note" id="zx-bm-note"></p>
+        <div class="zx-tbl zx-bm"><table id="zx-bm"><thead></thead><tbody></tbody></table></div>
+      </section>
+
+      <section class="zx-box zx-t2 zx-c12" id="zx-cmp-box" data-source="cases traits" aria-labelledby="zx-cmp-h">
+        <span class="zx-role">ตัวชี้วัดหลัก</span>
+        <h2 id="zx-cmp-h">เปรียบเทียบ</h2>
+        <p class="zx-note" id="zx-cmp-note"></p>
+        <div class="zx-legend" id="zx-leg-cmp"></div>
+        <div class="zx-tbl zx-cmp"><table id="zx-cmp"><thead></thead><tbody></tbody></table></div>
+      </section>
+    </div>
+
+    <p class="zx-sec">ผู้ป่วยและการนำส่ง <small>อายุ เพศ CPR ผลการดูแลเบื้องต้น โรงพยาบาลปลายทาง</small></p>
+    <div class="zx-grid">
+      <section class="zx-box zx-t2 zx-c4" id="zx-age-box" data-source="traits" aria-labelledby="zx-age-h">
+        <span class="zx-role">ตัวชี้วัดหลัก</span>
+        <h2 id="zx-age-h">กลุ่มอายุผู้ป่วย</h2>
+        <ul class="zx-defs" aria-label="นิยามกลุ่มอายุ">
+          <li><b>เด็ก</b> 0–14 ปี</li>
+          <li><b>ผู้ใหญ่</b> 15–59 ปี</li>
+          <li><b>ผู้สูงอายุ</b> 60 ปีขึ้นไป</li>
+          <li><b>ไม่ระบุ</b> อายุ 0 หรือว่าง</li>
+        </ul>
+        <div class="zx-rows" id="zx-age"></div>
+      </section>
+      <section class="zx-box zx-t2 zx-c4" id="zx-sex-box" data-source="traits" aria-labelledby="zx-sex-h">
+        <span class="zx-role">ตัวชี้วัดหลัก</span>
+        <h2 id="zx-sex-h">เพศผู้ป่วย</h2>
+        <p class="zx-note">ค่า 0 หรือว่างในไฟล์ นับเป็น “ไม่ระบุ”</p>
+        <div class="zx-rows" id="zx-sex"></div>
+      </section>
+      <section class="zx-box zx-t2 zx-c4" id="zx-cpr-box" data-source="traits" aria-labelledby="zx-cpr-h">
+        <span class="zx-role">ตัวชี้วัดหลัก</span>
+        <h2 id="zx-cpr-h">การทำ CPR</h2>
+        <p class="zx-note" id="zx-cpr-note"></p>
+        <div class="zx-rows" id="zx-cpr"></div>
+      </section>
+      <section class="zx-box zx-t2 zx-c5" id="zx-care-box" data-source="traits" aria-labelledby="zx-care-h">
+        <span class="zx-role">ตัวชี้วัดหลัก</span>
+        <h2 id="zx-care-h">ผลการดูแลรักษาเบื้องต้น</h2>
+        <div class="zx-dead" id="zx-dead"></div>
+        <div class="zx-rows" id="zx-care"></div>
+      </section>
+      <section class="zx-box zx-t2 zx-c7" id="zx-hosp-box" data-source="traits" aria-labelledby="zx-hosp-h">
+        <span class="zx-role">ตัวชี้วัดหลัก</span>
+        <h2 id="zx-hosp-h">โรงพยาบาลปลายทาง (นำส่งห้องฉุกเฉิน)</h2>
+        <div class="zx-tools">
+          <input id="zx-hq" type="search" placeholder="ค้นหาชื่อโรงพยาบาล" aria-label="ค้นหาชื่อโรงพยาบาล">
+          <span class="zx-note" id="zx-hosp-note"></span>
+        </div>
+        <div class="zx-tbl tall hosp"><table id="zx-hosp"><thead></thead><tbody></tbody></table></div>
+      </section>
+    </div>
+
+    <p class="zx-sec">ลักษณะของเหตุ <small>ชุดรหัสอาการ แขวง และเวลา</small></p>
+    <div class="zx-grid">
+      <section class="zx-box zx-t3 zx-tb zx-c6" id="zx-combo-box" data-source="traits" aria-labelledby="zx-combo-h">
+        <span class="zx-role">บริบท</span>
+        <h2 id="zx-combo-h">ชุดรหัสอาการ (รหัส-สี-ระดับ)</h2>
+        <p class="zx-note" id="zx-combo-note"></p>
+        <div class="zx-rows" id="zx-combo"></div>
+      </section>
+      <section class="zx-box zx-t3 zx-tr zx-c6" id="zx-lvc-box" data-source="traits" aria-labelledby="zx-lvc-h">
+        <span class="zx-role">บริบท</span>
+        <h2 id="zx-lvc-h">ชุดรหัสอาการ เทียบตามระดับหน่วย</h2>
+        <p class="zx-note" id="zx-lvc-note"></p>
+        <div class="zx-4" id="zx-lvc"></div>
+      </section>
+      <section class="zx-box zx-t3 zx-c4" id="zx-tam-box" data-source="traits" aria-labelledby="zx-tam-h">
+        <span class="zx-role">บริบท</span>
+        <h2 id="zx-tam-h">แขวงที่เกิดเหตุ</h2>
+        <p class="zx-note">10 แขวงแรก</p>
+        <div class="zx-rows" id="zx-tam"></div>
+      </section>
+      <section class="zx-box zx-t3 zx-tg zx-c5" id="zx-hour-box" data-source="traits" aria-labelledby="zx-hour-h">
+        <span class="zx-role">บริบท</span>
+        <h2 id="zx-hour-h">ช่วงเวลาของวัน (ชั่วโมงที่รับแจ้ง)</h2>
+        <div class="zx-chart" id="zx-hour"></div>
+      </section>
+      <section class="zx-box zx-t3 zx-ts zx-c3" id="zx-dow-box" data-source="traits" aria-labelledby="zx-dow-h">
+        <span class="zx-role">บริบท</span>
+        <h2 id="zx-dow-h">วันในสัปดาห์</h2>
+        <div class="zx-rows" id="zx-dow"></div>
+      </section>
+    </div>
+
+    <p class="zx-sec">ใครออกปฏิบัติการ <small>หน่วย กลุ่มหน่วย และเดือน</small></p>
+    <div class="zx-grid">
+      <section class="zx-box zx-t2 zx-c7" id="zx-units-box" data-source="cases" aria-labelledby="zx-units-h">
+        <span class="zx-role">ตัวชี้วัดหลัก</span>
+        <h2 id="zx-units-h">หน่วยที่ออกมากที่สุด</h2>
+        <p class="zx-note">12 หน่วยแรก · เอราวัณแยกเป็นรายจุดจอด</p>
+        <div class="zx-legend" id="zx-leg1"></div>
+        <div class="zx-rows" id="zx-units"></div>
+      </section>
+      <div class="zx-c5" style="display:flex;flex-direction:column;gap:1rem;min-width:0">
+        <section class="zx-box zx-t3 zx-tg" id="zx-grp-box" data-source="cases units" aria-labelledby="zx-grp-h" style="flex:1">
+          <span class="zx-role">บริบท</span>
+          <h2 id="zx-grp-h">กลุ่มหน่วยที่ออก</h2>
+          <p class="zx-note">จัดกลุ่มตามชื่อหน่วย: ศูนย์เอราวัณ · โรงพยาบาล · มูลนิธิ/กู้ชีพ</p>
+          <div class="zx-rows" id="zx-groups"></div>
+        </section>
+        <section class="zx-box zx-t3 zx-ts" id="zx-out-box" data-source="traits" aria-labelledby="zx-out-h" style="flex:1">
+          <span class="zx-role">บริบท</span>
+          <h2 id="zx-out-h">ผลปฏิบัติงานที่บันทึก</h2>
+          <p class="zx-note">ค่า 0 หรือว่างในไฟล์ นับเป็น “ไม่มีบันทึกผล”</p>
+          <div class="zx-rows" id="zx-outs"></div>
+        </section>
+      </div>
+      <section class="zx-box zx-t3 zx-c12" id="zx-month-box" data-source="cases" aria-labelledby="zx-month-h">
+        <span class="zx-role">บริบท</span>
+        <h2 id="zx-month-h">จำนวนเคสรายเดือน</h2>
+        <div class="zx-legend" id="zx-leg3"></div>
+        <div class="zx-chart" id="zx-month"></div>
+      </section>
+      <section class="zx-box zx-t2 zx-c12" id="zx-tbl-box" data-source="cases units" aria-labelledby="zx-tbl-h">
+        <span class="zx-role">ตัวชี้วัดหลัก</span>
+        <h2 id="zx-tbl-h">รายชื่อหน่วยที่ออกปฏิบัติการทั้งหมด</h2>
+        <div class="zx-tools">
+          <input id="zx-q" type="search" placeholder="ค้นหาชื่อหน่วย" aria-label="ค้นหาชื่อหน่วย">
+          <span class="zx-note" id="zx-tbl-note"></span>
+        </div>
+        <div class="zx-tbl tall units"><table id="zx-table"><thead></thead><tbody></tbody></table></div>
+      </section>
+
+      <details class="zx-box zx-t4 zx-c4" id="zx-flow-box" data-source="screening">
+        <summary>ที่มาข้อมูลและการคัดเคส</summary>
+        <span class="zx-role">อ้างอิง</span>
+        <div class="zx-body">
+          <p>ไฟล์ Data การออกเหตุ ศูนย์เอราวัณ ปีงบประมาณ 2569 (ฉบับเพิ่มอายุ เพศ CPR) แบ่งโซนตามเขตที่เกิดเหตุ (คอลัมน์ อำเภอ) ตามตาราง 50 เขต → 11 โซน ส่วนเขตจตุจักร บางกอกใหญ่ บางซื่อ บางบอน และวังทองหลาง แบ่งตามแขวง (คอลัมน์ ตำบล)</p>
+          <table id="zx-flow"><tbody></tbody></table>
+        </div>
+      </details>
+
+      <details class="zx-box zx-t4 zx-c4">
+        <summary>นิยามตัวชี้วัด</summary>
+        <span class="zx-role">อ้างอิง</span>
+        <div class="zx-body">
+          <dl style="margin:0">
+            <dt>Basic / Advance</dt><dd>คอลัมน์ จัดหน่วยบริการระดับ = BLS / ALS</dd>
+            <dt>อื่นๆ</dt><dd>ML, CLS, FR และ ERB รวมกัน แสดงรายตัวในตารางหน่วย</dd>
+            <dt>ไม่ระบุ</dt><dd>เคสที่คอลัมน์ระดับหน่วยว่าง</dd>
+            <dt>ชุดรหัสอาการ</dt><dd>รวมคอลัมน์ L รหัส + M สี + N ระดับ เป็นชุดเดียว เช่น 25แดง2 = รหัส 25 สีแดง ระดับ 2 ถ้าขาดตัวใดตัวหนึ่งนับเป็น “ไม่ระบุ”</dd>
+            <dt>กลุ่มอายุ (คอลัมน์ Q)</dt><dd>เด็ก 0–14 ปี · ผู้ใหญ่ 15–59 ปี · ผู้สูงอายุ 60 ปีขึ้นไป · อายุ 0 หรือว่าง = ไม่ระบุ</dd>
+            <dt>เพศ (คอลัมน์ R)</dt><dd>ชาย / หญิง ตามที่บันทึก ค่า 0 หรือว่าง = ไม่ระบุ</dd>
+            <dt>การทำ CPR (คอลัมน์ S)</dt><dd>Yes = CPR · Yes,AED/DF = CPR + AED/DF · AED/DF = AED/DF อย่างเดียว · No = ไม่ได้ทำ</dd>
+            <dt>ผลการดูแลรักษาเบื้องต้น (คอลัมน์ T)</dt><dd>แจกแจงตามที่บันทึก รวมถึง “เสียชีวิต ณ จุดเกิดเหตุ” ค่าว่าง = ไม่มีบันทึก</dd>
+            <dt>โรงพยาบาลปลายทาง (คอลัมน์ U)</dt><dd>ชื่อห้องฉุกเฉินที่นำส่ง ค่า 0 หรือว่าง = ไม่ได้นำส่ง / ไม่มีบันทึก</dd>
+            <dt>เขต</dt><dd>เขตที่เกิดเหตุ ไม่ใช่เขตที่ตั้งของหน่วย</dd>
+          </dl>
+        </div>
+      </details>
+
+      <details class="zx-box zx-t4 zx-c4">
+        <summary>ข้อควรระวังของข้อมูล</summary>
+        <span class="zx-role">อ้างอิง</span>
+        <div class="zx-body">
+          <p>อายุและเพศมีค่า 0 หรือว่างจำนวนหนึ่ง ซึ่งนับเป็น “ไม่ระบุ” สัดส่วนกลุ่มอายุและเพศจึงคิดจากเคสทั้งหมด รวมกลุ่มไม่ระบุ</p>
+          <p>“ไม่ได้นำส่ง / ไม่มีบันทึก” รวมทั้งเคสที่ไม่ได้นำส่งจริงและเคสที่ไม่ได้กรอกชื่อโรงพยาบาล แยกจากกันไม่ได้ในไฟล์นี้</p>
+          <p>เขตจตุจักร บางกอกใหญ่ บางซื่อ บางบอน วังทองหลาง อยู่สองโซน แต่ละโซนนับเฉพาะแขวงของตัวเอง</p>
+          <p>กลุ่มหน่วย (เอราวัณ / โรงพยาบาล / มูลนิธิและกู้ชีพ) จัดจากชื่อหน่วย ไม่มีคอลัมน์นี้ในไฟล์</p>
+          <p>ไฟล์ไม่มีชื่ออาการของแต่ละรหัส และไม่มีชื่อหรือเลขประจำตัวผู้ป่วย</p>
+        </div>
+      </details>
+    </div>
+    <div class="zx-err" id="zx-err" hidden>โหลดข้อมูลไม่สำเร็จ</div>
+  </main>
+  <div class="zt" id="zx-tip" hidden></div>
+</div>

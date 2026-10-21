@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Executive Summary ศูนย์เอราวัณ 2569</title>
+<meta name="description" content="รายงาน Executive Summary การนำส่งผู้ป่วยโดยระบบบริการการแพทย์ฉุกเฉิน ศูนย์เอราวัณ 1669 ปีงบประมาณ 2569 แยก 11 โซน">
+<link rel="icon" href="assets/erawan-logo.png">
+<style>
+/* theme tokens that the Claude Dashboard host provides; defined here for the GitHub Pages build */
+:root {
+  --font-anthropic-sans: system-ui, -apple-system, "Segoe UI", "Noto Sans Thai", "Leelawadee UI", "Thonburi", sans-serif;
+  --font-anthropic-serif: "Noto Serif Thai", Georgia, serif;
+  --color-bg: #fbfcfb; --color-fg: #1b2420; --color-fg-muted: #5b6a63; --color-panel: #ffffff;
+  --color-border-line: #dfe5e2; --color-bad: #c8373f;
+  --cds-font-size-body: 0.9375rem; --cds-font-size-caption: 0.8125rem; --cds-font-size-heading: 1.0625rem;
+  --cds-chart-axis: #b9c3be; --cds-chart-grid: #e7ece9; --cds-chart-muted: #9aa6a0;
+  --cds-surface-popover: #ffffff; --cds-border: #dfe5e2; --cds-text-secondary: #5b6a63;
+  --cds-shadow-popover: 0 8px 24px -10px rgba(14, 59, 44, .35);
+  --cds-pad-xs: .45rem; --cds-pad-sm: .7rem;
+  --cds-dur-slow: .4s; --cds-ease-out: cubic-bezier(.2, .7, .2, 1);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-bg: #121815; --color-fg: #e6ece9; --color-fg-muted: #9db0a7; --color-panel: #1a2320;
+    --color-border-line: #2c3833; --cds-chart-axis: #4b5a53; --cds-chart-grid: #26312c; --cds-chart-muted: #6f8078;
+    --cds-surface-popover: #1f2925; --cds-border: #33413a; --cds-text-secondary: #9db0a7;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --color-bg: #121815; --color-fg: #e6ece9; --color-fg-muted: #9db0a7; --color-panel: #1a2320;
+  --color-border-line: #2c3833; --cds-chart-axis: #4b5a53; --cds-chart-grid: #26312c; --cds-chart-muted: #6f8078;
+  --cds-surface-popover: #1f2925; --cds-border: #33413a; --cds-text-secondary: #9db0a7;
+  color-scheme: dark;
+}
+html, body { margin: 0; background: var(--color-bg); color: var(--color-fg); }
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+{{CSS}}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+</head>
+<body>
+<div id="dash-root">
+{{BODY}}
+</div>
+<script>
+/* minimal stand-in for the Claude Dashboard `dash` API: loads data/<id>.json */
+(function () {
+  const ids = ['cases', 'traits', 'units', 'zones', 'screening'];
+  const state = {};
+  const subs = [];
+  const fire = () => subs.forEach((fn) => fn());
+  ids.forEach((id) => {
+    state[id] = { status: 'loading', data: [] };
+    fetch('data/' + id + '.json', { cache: 'no-cache' })
+      .then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then((d) => { state[id] = { status: 'ok', data: d }; fire(); })
+      .catch((e) => { state[id] = { status: 'error', data: [], message: String(e) }; fire(); });
+  });
+  let t;
+  window.addEventListener('resize', () => { clearTimeout(t); t = setTimeout(fire, 150); });
+  window.dash = {
+    data: (id) => state[id] || { status: 'missing', data: [] },
+    onData: (fn) => { subs.push(fn); fn(); }
+  };
+})();
+</script>
+<script>
+{{JS}}
+</script>
+</body>
+</html>
