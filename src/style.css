@@ -6,7 +6,7 @@
 .zx {
   --g900: #0e3b2c; --g800: #134d3a; --g600: #1f7a58; --gold: #e3b341;
   --lv-basic: #2b7bb9; --lv-adv: #d9434b; --lv-oth: #d49a1f; --lv-unk: #98a4ad;
-  --lv-ml: #d49a1f; --lv-cls: #9a6a10; --lv-fr: #ecc86f; --lv-erb: #6b4f12;
+  --lv-ml: #22e36a; --lv-cls: #9a6a10; --lv-fr: #ecc86f; --lv-erb: #6b4f12;
   --sx-m: #1f7f86; --sx-f: #9b4d8a;
   --ag-1: #9fd3bd; --ag-2: #3f9a76; --ag-3: #165c43;
   --pa: #1f7a58; --pb: #b07d12;
@@ -17,13 +17,14 @@
   --tint-rose: color-mix(in srgb, #d9434b 11%, var(--color-bg));
   --tint-gold: color-mix(in srgb, #e3b341 18%, var(--color-bg));
   --tint-slate: color-mix(in srgb, #8a9aa5 15%, var(--color-bg));
+  --tint-neon: color-mix(in srgb, #22e36a 16%, var(--color-bg));
   --canvas: color-mix(in srgb, #2f9e75 5%, var(--color-bg));
   --edge: color-mix(in srgb, var(--color-fg) 12%, transparent);
 }
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .zx { --lv-basic: #4a95d0; --lv-adv: #e5636a; --lv-oth: #d6a02a; --lv-unk: #8794a0; --bar: #4fb48f; --g900: #0b2c21; --g800: #104030; --lv-ml: #d6a02a; --lv-cls: #b8862a; --lv-fr: #f0d48a; --lv-erb: #8f6d24; --sx-m: #45b0b8; --sx-f: #c77bb5; --ag-1: #b5e2cf; --ag-2: #58b48e; --ag-3: #2a7d5d; --pa: #4fb48f; --pb: #d6a02a; --o-dead: #e5636a; --o-tx: #a63a43; --o-alive: #4fb48f; --o-blank: #2f5a4a; }
+  :root:not([data-theme="light"]) .zx { --lv-basic: #4a95d0; --lv-adv: #e5636a; --lv-oth: #d6a02a; --lv-unk: #8794a0; --bar: #4fb48f; --g900: #0b2c21; --g800: #104030; --lv-ml: #45ff8f; --lv-cls: #b8862a; --lv-fr: #f0d48a; --lv-erb: #8f6d24; --sx-m: #45b0b8; --sx-f: #c77bb5; --ag-1: #b5e2cf; --ag-2: #58b48e; --ag-3: #2a7d5d; --pa: #4fb48f; --pb: #d6a02a; --o-dead: #e5636a; --o-tx: #a63a43; --o-alive: #4fb48f; --o-blank: #2f5a4a; }
 }
-:root[data-theme="dark"] .zx { --lv-basic: #4a95d0; --lv-adv: #e5636a; --lv-oth: #d6a02a; --lv-unk: #8794a0; --bar: #4fb48f; --g900: #0b2c21; --g800: #104030; --lv-ml: #d6a02a; --lv-cls: #b8862a; --lv-fr: #f0d48a; --lv-erb: #8f6d24; --sx-m: #45b0b8; --sx-f: #c77bb5; --ag-1: #b5e2cf; --ag-2: #58b48e; --ag-3: #2a7d5d; --pa: #4fb48f; --pb: #d6a02a; --o-dead: #e5636a; --o-tx: #a63a43; --o-alive: #4fb48f; --o-blank: #2f5a4a; }
+:root[data-theme="dark"] .zx { --lv-basic: #4a95d0; --lv-adv: #e5636a; --lv-oth: #d6a02a; --lv-unk: #8794a0; --bar: #4fb48f; --g900: #0b2c21; --g800: #104030; --lv-ml: #45ff8f; --lv-cls: #b8862a; --lv-fr: #f0d48a; --lv-erb: #8f6d24; --sx-m: #45b0b8; --sx-f: #c77bb5; --ag-1: #b5e2cf; --ag-2: #58b48e; --ag-3: #2a7d5d; --pa: #4fb48f; --pb: #d6a02a; --o-dead: #e5636a; --o-tx: #a63a43; --o-alive: #4fb48f; --o-blank: #2f5a4a; }
 
 .zx { position: relative; display: grid; grid-template-columns: 15.5rem minmax(0, 1fr); font-family: var(--font-anthropic-sans); color: var(--color-fg); font-size: var(--cds-font-size-body); background: var(--canvas); }
 .zx *, .zx *::before, .zx *::after { box-sizing: border-box; }
@@ -98,18 +99,22 @@
 
 /* level tiles */
 .zx-heroarea { display: flex; flex-direction: column; gap: .75rem; min-width: 0; }
-.zx-hero { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; flex: 1; }
+.zx-hero { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: .75rem; flex: 1; }
+.zx-tile { grid-column: span 2; }
+.zx-tile[data-g="Basic"], .zx-tile[data-g="Advance"] { grid-column: span 3; }
 .zx-tile { position: relative; display: flex; flex-direction: column; justify-content: flex-end; gap: .1rem; text-align: left; border: 2px solid transparent; border-radius: 22px 22px 22px 8px; padding: .9rem 1rem; cursor: pointer; min-height: 7.2rem; }
 .zx-tile[data-g="Basic"] { background: var(--tint-blue); }
 .zx-tile[data-g="Advance"] { background: var(--tint-rose); border-radius: 22px 22px 8px 22px; }
-.zx-tile[data-g="อื่นๆ"] { background: var(--tint-gold); min-height: 5.4rem; border-radius: 8px 22px 22px 22px; }
+.zx-tile[data-g="ML"] { background: var(--tint-neon); min-height: 5.4rem; border-radius: 8px 22px 22px 22px; }
+.zx-tile[data-g="ML"] .l .zx-sw { box-shadow: 0 0 0 2px color-mix(in srgb, var(--lv-ml) 35%, transparent), 0 0 8px var(--lv-ml); }
+.zx-tile[data-g="อื่นๆ"] { background: var(--tint-gold); min-height: 5.4rem; border-radius: 22px; }
 .zx-tile[data-g="ไม่ระบุ"] { background: var(--tint-slate); min-height: 5.4rem; border-radius: 22px 8px 22px 22px; }
 .zx-tile:hover { border-color: color-mix(in srgb, var(--tc) 45%, transparent); }
 .zx-tile[aria-pressed="true"] { border-color: var(--tc); }
 .zx-tile:focus-visible { outline: 2px solid var(--color-fg); outline-offset: 2px; }
 .zx-tile .l { font-size: var(--cds-font-size-caption); display: flex; align-items: center; gap: .45rem; margin-bottom: auto; }
 .zx-tile .n { font-size: 2.5rem; font-weight: 700; line-height: 1.05; font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
-.zx-tile[data-g="อื่นๆ"] .n, .zx-tile[data-g="ไม่ระบุ"] .n { font-size: 1.7rem; }
+.zx-tile[data-g="ML"] .n, .zx-tile[data-g="อื่นๆ"] .n, .zx-tile[data-g="ไม่ระบุ"] .n { font-size: 1.7rem; }
 .zx-tile .p { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); font-variant-numeric: tabular-nums; }
 .zx-tile .l .zx-sw { width: .7rem; height: .7rem; border-radius: 50%; }
 .zx-sharebox { background: var(--color-panel); border: 1px solid var(--edge); border-radius: 14px; padding: .7rem .85rem; display: flex; flex-direction: column; gap: .4rem; }

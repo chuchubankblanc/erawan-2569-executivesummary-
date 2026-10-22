@@ -1,7 +1,8 @@
 (function () {
-  const G4 = ['Basic', 'Advance', 'อื่นๆ', 'ไม่ระบุ'];
-  const G4OF = { Basic: 'Basic', Advance: 'Advance', ML: 'อื่นๆ', CLS: 'อื่นๆ', FR: 'อื่นๆ', ERB: 'อื่นๆ', 'ไม่ระบุ': 'ไม่ระบุ' };
-  const G4LONG = { Basic: 'Basic (BLS)', Advance: 'Advance (ALS)', 'อื่นๆ': 'อื่นๆ (ML · CLS · FR · ERB)', 'ไม่ระบุ': 'ไม่ระบุระดับ' };
+  // level groups shown across the page (ML has its own group; อื่นๆ = CLS · FR · ERB)
+  const G4 = ['Basic', 'Advance', 'ML', 'อื่นๆ', 'ไม่ระบุ'];
+  const G4OF = { Basic: 'Basic', Advance: 'Advance', ML: 'ML', CLS: 'อื่นๆ', FR: 'อื่นๆ', ERB: 'อื่นๆ', 'ไม่ระบุ': 'ไม่ระบุ' };
+  const G4LONG = { Basic: 'Basic (BLS)', Advance: 'Advance (ALS)', ML: 'ML', 'อื่นๆ': 'อื่นๆ (CLS · FR · ERB)', 'ไม่ระบุ': 'ไม่ระบุระดับ' };
   const ZONES = d3.range(1, 12);
   const GROUPS = ['ศูนย์เอราวัณ', 'โรงพยาบาล', 'มูลนิธิ / กู้ชีพ'];
   const DIMS = ['combo', 'tambon', 'hour', 'dow', 'outcome', 'age', 'sex', 'cpr', 'care', 'hosp', 'cprout'];
@@ -49,7 +50,7 @@
   const LV7NAME = { Basic: 'BLS (Basic)', Advance: 'ALS (Advance)', ML: 'ML', CLS: 'CLS', FR: 'FR', ERB: 'ERB', 'ไม่ระบุ': 'ไม่ระบุระดับ' };
   const LV7C = { Basic: 'var(--lv-basic)', Advance: 'var(--lv-adv)', ML: 'var(--lv-ml)', CLS: 'var(--lv-cls)', FR: 'var(--lv-fr)', ERB: 'var(--lv-erb)', 'ไม่ระบุ': 'var(--lv-unk)' };
 
-  const C = () => ({ Basic: 'var(--lv-basic)', Advance: 'var(--lv-adv)', 'อื่นๆ': 'var(--lv-oth)', 'ไม่ระบุ': 'var(--lv-unk)' });
+  const C = () => ({ Basic: 'var(--lv-basic)', Advance: 'var(--lv-adv)', ML: 'var(--lv-ml)', 'อื่นๆ': 'var(--lv-oth)', 'ไม่ระบุ': 'var(--lv-unk)' });
 
   function el(tag, cls, text) {
     const e = document.createElement(tag);
@@ -115,7 +116,7 @@
       u.lv[r.level] = (u.lv[r.level] || 0) + n;
       u.total += n;
       let m = c.month.get(r.month);
-      if (!m) { m = { Basic: 0, Advance: 0, 'อื่นๆ': 0, 'ไม่ระบุ': 0, total: 0 }; c.month.set(r.month, m); }
+      if (!m) { m = { Basic: 0, Advance: 0, ML: 0, 'อื่นๆ': 0, 'ไม่ระบุ': 0, total: 0 }; c.month.set(r.month, m); }
       m[g4] += n;
       m.total += n;
       let gp = c.grp[grp];
@@ -131,7 +132,7 @@
       c.tr[r.dim].set(r.key, (c.tr[r.dim].get(r.key) || 0) + n);
       if (r.dim === 'hosp') {
         let h = c.hosp.get(r.key);
-        if (!h) { h = { Basic: 0, Advance: 0, 'อื่นๆ': 0, 'ไม่ระบุ': 0, total: 0 }; c.hosp.set(r.key, h); }
+        if (!h) { h = { Basic: 0, Advance: 0, ML: 0, 'อื่นๆ': 0, 'ไม่ระบุ': 0, total: 0 }; c.hosp.set(r.key, h); }
         h[g4] += n;
         h.total += n;
       }
@@ -139,7 +140,7 @@
     return c;
   }
   function g4of(lv) {
-    return { Basic: lv.Basic || 0, Advance: lv.Advance || 0, 'อื่นๆ': (lv.ML || 0) + (lv.CLS || 0) + (lv.FR || 0) + (lv.ERB || 0), 'ไม่ระบุ': lv['ไม่ระบุ'] || 0 };
+    return { Basic: lv.Basic || 0, Advance: lv.Advance || 0, ML: lv.ML || 0, 'อื่นๆ': (lv.CLS || 0) + (lv.FR || 0) + (lv.ERB || 0), 'ไม่ระบุ': lv['ไม่ระบุ'] || 0 };
   }
   const trv = (c1, dim, key) => c1.tr[dim].get(key) || 0;
   const cprAny = (c1) => d3.sum([...c1.tr.cpr.entries()], (e) => (/CPR|AED/.test(e[0]) ? e[1] : 0));
@@ -160,7 +161,7 @@
       box.appendChild(s);
     });
   }
-  const legG4 = (box) => legend(box, G4.map((k) => [k === 'อื่นๆ' ? 'อื่นๆ (ML · CLS · FR · ERB)' : k, C()[k]]));
+  const legG4 = (box) => legend(box, G4.map((k) => [k === 'อื่นๆ' ? 'อื่นๆ (CLS · FR · ERB)' : k, C()[k]]));
 
   function stackRow(name, parts, total, max) {
     const row = el('div', 'zx-row');
@@ -280,7 +281,7 @@
       ol.appendChild(x);
     };
     const oth = base.lv;
-    li('ภาพรวม', [dlabel(zone, sel) + ' มี ', { b: fmt(base.total) }, ' เคส: Basic ', { b: fmt(cnt.Basic) }, ' (' + share(cnt.Basic, base.total) + ') · Advance ', { b: fmt(cnt.Advance) }, ' (' + share(cnt.Advance, base.total) + ') · อื่นๆ ', { b: fmt(cnt['อื่นๆ']) }, ' (ML ' + fmt(oth.ML || 0) + ', CLS ' + fmt(oth.CLS || 0) + ', FR ' + fmt(oth.FR || 0) + ', ERB ' + fmt(oth.ERB || 0) + ') · ไม่ระบุระดับ ', { b: fmt(cnt['ไม่ระบุ']) }],
+    li('ภาพรวม', [dlabel(zone, sel) + ' มี ', { b: fmt(base.total) }, ' เคส: Basic ', { b: fmt(cnt.Basic) }, ' (' + share(cnt.Basic, base.total) + ') · Advance ', { b: fmt(cnt.Advance) }, ' (' + share(cnt.Advance, base.total) + ') · ML ', { b: fmt(cnt.ML) }, ' (' + share(cnt.ML, base.total) + ') · อื่นๆ ', { b: fmt(cnt['อื่นๆ']) }, ' (CLS ' + fmt(oth.CLS || 0) + ', FR ' + fmt(oth.FR || 0) + ', ERB ' + fmt(oth.ERB || 0) + ') · ไม่ระบุระดับ ', { b: fmt(cnt['ไม่ระบุ']) }],
       cnt.Advance ? 'เคส Basic มากกว่า Advance ประมาณ ' + d3.format('.1f')(cnt.Basic / cnt.Advance) + ' เท่า' : null);
 
     const dead = trv(cur, 'care', DEAD);
@@ -327,7 +328,7 @@
       b.appendChild(l);
       b.appendChild(el('span', 'n', fmt(cnt[g])));
       let sub = share(cnt[g], base.total) + ' ของเคส';
-      if (g === 'อื่นๆ') sub = 'ML ' + fmt(base.lv.ML || 0) + ' · CLS ' + fmt(base.lv.CLS || 0) + ' · FR ' + fmt(base.lv.FR || 0) + ' · ERB ' + fmt(base.lv.ERB || 0);
+      if (g === 'อื่นๆ') sub = 'CLS ' + fmt(base.lv.CLS || 0) + ' · FR ' + fmt(base.lv.FR || 0) + ' · ERB ' + fmt(base.lv.ERB || 0);
       b.appendChild(el('span', 'p', sub));
       b.addEventListener('click', () => setLf(lf === g ? 'all' : g));
       box.appendChild(b);
@@ -383,7 +384,7 @@
       const sw = el('i', 'zx-sw'); sw.style.background = c[g];
       h.appendChild(sw); h.appendChild(document.createTextNode(g));
       th.appendChild(h);
-      if (g === 'อื่นๆ') th.appendChild(el('small', null, 'ML · CLS · FR · ERB'));
+      if (g === 'อื่นๆ') th.appendChild(el('small', null, 'CLS · FR · ERB'));
       tr.appendChild(th);
     });
     $('zx-bm').tHead.replaceChildren(tr);
@@ -423,7 +424,7 @@
       const row = el('tr');
       if (r[0] === 'grp') {
         row.className = 'grp';
-        const td = el('td', null, r[1]); td.colSpan = 5; row.appendChild(td);
+        const td = el('td', null, r[1]); td.colSpan = G4.length + 1; row.appendChild(td);
       } else {
         row.appendChild(el('td', 'lbl', r[0]));
         G4.forEach((g) => row.appendChild(el('td', lf === g ? 'hl' : null, cs[g].total ? r[1](cs[g]) : '—')));
@@ -437,7 +438,7 @@
     const byZone = zone === 'all';
     $('zx-cmp-h').textContent = byZone ? 'เปรียบเทียบ 11 โซน' : 'เปรียบเทียบเขตใน Zone ' + zone;
     $('zx-cmp-note').textContent = (lf === 'all' ? 'ทุกระดับหน่วย' : 'เฉพาะ ' + G4LONG[lf]) + ' · กดแถวเพื่อดูเฉพาะ' + (byZone ? 'โซน' : 'เขต') + 'นั้น · เปอร์เซ็นต์คิดจากเคสในแถวนั้น';
-    const heads = [byZone ? 'โซน' : 'เขต', 'เคสรวม', 'สัดส่วนระดับ', 'Basic', 'Advance', 'อื่นๆ', 'ไม่ระบุ', 'ผู้สูงอายุ', 'ทำ CPR/AED', 'เสียชีวิต ณ จุดเกิดเหตุ', 'นำส่งห้องฉุกเฉิน', 'ชุดรหัสอันดับ 1'];
+    const heads = [byZone ? 'โซน' : 'เขต', 'เคสรวม', 'สัดส่วนระดับ', 'Basic', 'Advance', 'ML', 'อื่นๆ', 'ไม่ระบุ', 'ผู้สูงอายุ', 'ทำ CPR/AED', 'เสียชีวิต ณ จุดเกิดเหตุ', 'นำส่งห้องฉุกเฉิน', 'ชุดรหัสอันดับ 1'];
     const tr = el('tr');
     heads.forEach((h) => tr.appendChild(el('th', null, h)));
     $('zx-cmp').tHead.replaceChildren(tr);
@@ -601,7 +602,7 @@
     $('zx-cpr-note').textContent = 'รอดชีวิต = ไม่ได้ลงว่าเสียชีวิต (นับรวมเคสที่ช่องผลการดูแลเบื้องต้นว่าง) · เสียชีวิตขณะนำส่งแยกไว้ต่างหาก · ร้อยละในแถบคิดจากเคสที่ทำ CPR วิธีนั้น · ' + dlabel(zone, sel) + (lf === 'all' ? '' : ' · ' + lf);
   }
 
-  const HCOLS = [['name', 'โรงพยาบาล'], ['Basic', 'Basic'], ['Advance', 'Advance'], ['อื่นๆ', 'อื่นๆ'], ['ไม่ระบุ', 'ไม่ระบุ'], ['total', 'รวม'], ['share', '% ของเคสที่นำส่ง']];
+  const HCOLS = [['name', 'โรงพยาบาล'], ['Basic', 'Basic'], ['Advance', 'Advance'], ['ML', 'ML'], ['อื่นๆ', 'อื่นๆ'], ['ไม่ระบุ', 'ไม่ระบุ'], ['total', 'รวม'], ['share', '% ของเคสที่นำส่ง']];
   function buildHospHead() {
     const tr = el('tr');
     tr.appendChild(el('th', null, 'เทียบ'));
@@ -1162,7 +1163,7 @@
     const base = cohort(zone, sel, 'all');
     const cnt = g4of(base.lv);
     $('zx-title').textContent = (org === 'erawan' ? 'รถศูนย์เอราวัณ · ' : '') + (zone === 'all' ? 'กรุงเทพมหานคร · ภาพรวม 11 โซน' : sel === 'all' ? 'Zone ' + zone + ' · ภาพรวม ' + (zoneDists.get(zone) || []).length + ' เขต' : 'Zone ' + zone + ' · เขต' + sel);
-    $('zx-sub').textContent = 'Basic ' + fmt(cnt.Basic) + ' · Advance ' + fmt(cnt.Advance) + ' · อื่นๆ ' + fmt(cnt['อื่นๆ']) + ' · ไม่ระบุ ' + fmt(cnt['ไม่ระบุ']) + ' จากทั้งหมด ' + fmt(base.total) + ' เคส' + (lf === 'all' ? '' : ' · กำลังดูเฉพาะ ' + G4LONG[lf]);
+    $('zx-sub').textContent = 'Basic ' + fmt(cnt.Basic) + ' · Advance ' + fmt(cnt.Advance) + ' · ML ' + fmt(cnt.ML) + ' · อื่นๆ ' + fmt(cnt['อื่นๆ']) + ' · ไม่ระบุ ' + fmt(cnt['ไม่ระบุ']) + ' จากทั้งหมด ' + fmt(base.total) + ' เคส' + (lf === 'all' ? '' : ' · กำลังดูเฉพาะ ' + G4LONG[lf]);
     renderSide();
     renderSummary();
     renderHero();

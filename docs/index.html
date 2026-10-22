@@ -46,7 +46,7 @@ img { max-width: 100%; }
 .zx {
   --g900: #0e3b2c; --g800: #134d3a; --g600: #1f7a58; --gold: #e3b341;
   --lv-basic: #2b7bb9; --lv-adv: #d9434b; --lv-oth: #d49a1f; --lv-unk: #98a4ad;
-  --lv-ml: #d49a1f; --lv-cls: #9a6a10; --lv-fr: #ecc86f; --lv-erb: #6b4f12;
+  --lv-ml: #22e36a; --lv-cls: #9a6a10; --lv-fr: #ecc86f; --lv-erb: #6b4f12;
   --sx-m: #1f7f86; --sx-f: #9b4d8a;
   --ag-1: #9fd3bd; --ag-2: #3f9a76; --ag-3: #165c43;
   --pa: #1f7a58; --pb: #b07d12;
@@ -57,13 +57,14 @@ img { max-width: 100%; }
   --tint-rose: color-mix(in srgb, #d9434b 11%, var(--color-bg));
   --tint-gold: color-mix(in srgb, #e3b341 18%, var(--color-bg));
   --tint-slate: color-mix(in srgb, #8a9aa5 15%, var(--color-bg));
+  --tint-neon: color-mix(in srgb, #22e36a 16%, var(--color-bg));
   --canvas: color-mix(in srgb, #2f9e75 5%, var(--color-bg));
   --edge: color-mix(in srgb, var(--color-fg) 12%, transparent);
 }
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .zx { --lv-basic: #4a95d0; --lv-adv: #e5636a; --lv-oth: #d6a02a; --lv-unk: #8794a0; --bar: #4fb48f; --g900: #0b2c21; --g800: #104030; --lv-ml: #d6a02a; --lv-cls: #b8862a; --lv-fr: #f0d48a; --lv-erb: #8f6d24; --sx-m: #45b0b8; --sx-f: #c77bb5; --ag-1: #b5e2cf; --ag-2: #58b48e; --ag-3: #2a7d5d; --pa: #4fb48f; --pb: #d6a02a; --o-dead: #e5636a; --o-tx: #a63a43; --o-alive: #4fb48f; --o-blank: #2f5a4a; }
+  :root:not([data-theme="light"]) .zx { --lv-basic: #4a95d0; --lv-adv: #e5636a; --lv-oth: #d6a02a; --lv-unk: #8794a0; --bar: #4fb48f; --g900: #0b2c21; --g800: #104030; --lv-ml: #45ff8f; --lv-cls: #b8862a; --lv-fr: #f0d48a; --lv-erb: #8f6d24; --sx-m: #45b0b8; --sx-f: #c77bb5; --ag-1: #b5e2cf; --ag-2: #58b48e; --ag-3: #2a7d5d; --pa: #4fb48f; --pb: #d6a02a; --o-dead: #e5636a; --o-tx: #a63a43; --o-alive: #4fb48f; --o-blank: #2f5a4a; }
 }
-:root[data-theme="dark"] .zx { --lv-basic: #4a95d0; --lv-adv: #e5636a; --lv-oth: #d6a02a; --lv-unk: #8794a0; --bar: #4fb48f; --g900: #0b2c21; --g800: #104030; --lv-ml: #d6a02a; --lv-cls: #b8862a; --lv-fr: #f0d48a; --lv-erb: #8f6d24; --sx-m: #45b0b8; --sx-f: #c77bb5; --ag-1: #b5e2cf; --ag-2: #58b48e; --ag-3: #2a7d5d; --pa: #4fb48f; --pb: #d6a02a; --o-dead: #e5636a; --o-tx: #a63a43; --o-alive: #4fb48f; --o-blank: #2f5a4a; }
+:root[data-theme="dark"] .zx { --lv-basic: #4a95d0; --lv-adv: #e5636a; --lv-oth: #d6a02a; --lv-unk: #8794a0; --bar: #4fb48f; --g900: #0b2c21; --g800: #104030; --lv-ml: #45ff8f; --lv-cls: #b8862a; --lv-fr: #f0d48a; --lv-erb: #8f6d24; --sx-m: #45b0b8; --sx-f: #c77bb5; --ag-1: #b5e2cf; --ag-2: #58b48e; --ag-3: #2a7d5d; --pa: #4fb48f; --pb: #d6a02a; --o-dead: #e5636a; --o-tx: #a63a43; --o-alive: #4fb48f; --o-blank: #2f5a4a; }
 
 .zx { position: relative; display: grid; grid-template-columns: 15.5rem minmax(0, 1fr); font-family: var(--font-anthropic-sans); color: var(--color-fg); font-size: var(--cds-font-size-body); background: var(--canvas); }
 .zx *, .zx *::before, .zx *::after { box-sizing: border-box; }
@@ -138,18 +139,22 @@ img { max-width: 100%; }
 
 /* level tiles */
 .zx-heroarea { display: flex; flex-direction: column; gap: .75rem; min-width: 0; }
-.zx-hero { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; flex: 1; }
+.zx-hero { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: .75rem; flex: 1; }
+.zx-tile { grid-column: span 2; }
+.zx-tile[data-g="Basic"], .zx-tile[data-g="Advance"] { grid-column: span 3; }
 .zx-tile { position: relative; display: flex; flex-direction: column; justify-content: flex-end; gap: .1rem; text-align: left; border: 2px solid transparent; border-radius: 22px 22px 22px 8px; padding: .9rem 1rem; cursor: pointer; min-height: 7.2rem; }
 .zx-tile[data-g="Basic"] { background: var(--tint-blue); }
 .zx-tile[data-g="Advance"] { background: var(--tint-rose); border-radius: 22px 22px 8px 22px; }
-.zx-tile[data-g="อื่นๆ"] { background: var(--tint-gold); min-height: 5.4rem; border-radius: 8px 22px 22px 22px; }
+.zx-tile[data-g="ML"] { background: var(--tint-neon); min-height: 5.4rem; border-radius: 8px 22px 22px 22px; }
+.zx-tile[data-g="ML"] .l .zx-sw { box-shadow: 0 0 0 2px color-mix(in srgb, var(--lv-ml) 35%, transparent), 0 0 8px var(--lv-ml); }
+.zx-tile[data-g="อื่นๆ"] { background: var(--tint-gold); min-height: 5.4rem; border-radius: 22px; }
 .zx-tile[data-g="ไม่ระบุ"] { background: var(--tint-slate); min-height: 5.4rem; border-radius: 22px 8px 22px 22px; }
 .zx-tile:hover { border-color: color-mix(in srgb, var(--tc) 45%, transparent); }
 .zx-tile[aria-pressed="true"] { border-color: var(--tc); }
 .zx-tile:focus-visible { outline: 2px solid var(--color-fg); outline-offset: 2px; }
 .zx-tile .l { font-size: var(--cds-font-size-caption); display: flex; align-items: center; gap: .45rem; margin-bottom: auto; }
 .zx-tile .n { font-size: 2.5rem; font-weight: 700; line-height: 1.05; font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
-.zx-tile[data-g="อื่นๆ"] .n, .zx-tile[data-g="ไม่ระบุ"] .n { font-size: 1.7rem; }
+.zx-tile[data-g="ML"] .n, .zx-tile[data-g="อื่นๆ"] .n, .zx-tile[data-g="ไม่ระบุ"] .n { font-size: 1.7rem; }
 .zx-tile .p { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); font-variant-numeric: tabular-nums; }
 .zx-tile .l .zx-sw { width: .7rem; height: .7rem; border-radius: 50%; }
 .zx-sharebox { background: var(--color-panel); border: 1px solid var(--edge); border-radius: 14px; padding: .7rem .85rem; display: flex; flex-direction: column; gap: .4rem; }
@@ -432,7 +437,7 @@ button.it { cursor: pointer; }
     <div class="zx-grid">
       <section class="zx-box zx-t2 zx-c12" id="zx-bm-box" data-source="cases traits" aria-labelledby="zx-bm-h">
         <span class="zx-role">ตัวชี้วัดหลัก</span>
-        <h2 id="zx-bm-h">เทียบ Basic · Advance · อื่นๆ · ไม่ระบุ</h2>
+        <h2 id="zx-bm-h">เทียบ Basic · Advance · ML · อื่นๆ · ไม่ระบุ</h2>
         <p class="zx-note" id="zx-bm-note"></p>
         <div class="zx-tbl zx-bm"><table id="zx-bm"><thead></thead><tbody></tbody></table></div>
       </section>
@@ -615,7 +620,8 @@ button.it { cursor: pointer; }
         <div class="zx-body">
           <dl style="margin:0">
             <dt>Basic / Advance</dt><dd>คอลัมน์ จัดหน่วยบริการระดับ = BLS / ALS</dd>
-            <dt>อื่นๆ</dt><dd>ML, CLS, FR และ ERB รวมกัน แสดงรายตัวในตารางหน่วย</dd>
+            <dt>ML</dt><dd>คอลัมน์ จัดหน่วยบริการระดับ = ML แยกเป็นกลุ่มของตัวเอง</dd>
+            <dt>อื่นๆ</dt><dd>CLS, FR และ ERB รวมกัน แสดงรายตัวในตารางหน่วย</dd>
             <dt>ไม่ระบุ</dt><dd>เคสที่คอลัมน์ระดับหน่วยว่าง</dd>
             <dt>ชุดรหัสอาการ</dt><dd>รวมคอลัมน์ L รหัส + M สี + N ระดับ เป็นชุดเดียว เช่น 25แดง2 = รหัส 25 (อุบัติเหตุยานยนต์) สีแดง ระดับ 2 ถ้าขาดตัวใดตัวหนึ่งนับเป็น “ไม่ระบุ” ชื่ออาการดูในกล่อง “นิยามรหัสอาการ 1–26”</dd>
             <dt>กลุ่มอายุ (คอลัมน์ Q)</dt><dd>เด็ก 0–14 ปี · ผู้ใหญ่ 15–59 ปี · ผู้สูงอายุ 60 ปีขึ้นไป · อายุ 0 หรือว่าง = ไม่ระบุ</dd>
@@ -671,9 +677,10 @@ button.it { cursor: pointer; }
 </script>
 <script>
 (function () {
-  const G4 = ['Basic', 'Advance', 'อื่นๆ', 'ไม่ระบุ'];
-  const G4OF = { Basic: 'Basic', Advance: 'Advance', ML: 'อื่นๆ', CLS: 'อื่นๆ', FR: 'อื่นๆ', ERB: 'อื่นๆ', 'ไม่ระบุ': 'ไม่ระบุ' };
-  const G4LONG = { Basic: 'Basic (BLS)', Advance: 'Advance (ALS)', 'อื่นๆ': 'อื่นๆ (ML · CLS · FR · ERB)', 'ไม่ระบุ': 'ไม่ระบุระดับ' };
+  // level groups shown across the page (ML has its own group; อื่นๆ = CLS · FR · ERB)
+  const G4 = ['Basic', 'Advance', 'ML', 'อื่นๆ', 'ไม่ระบุ'];
+  const G4OF = { Basic: 'Basic', Advance: 'Advance', ML: 'ML', CLS: 'อื่นๆ', FR: 'อื่นๆ', ERB: 'อื่นๆ', 'ไม่ระบุ': 'ไม่ระบุ' };
+  const G4LONG = { Basic: 'Basic (BLS)', Advance: 'Advance (ALS)', ML: 'ML', 'อื่นๆ': 'อื่นๆ (CLS · FR · ERB)', 'ไม่ระบุ': 'ไม่ระบุระดับ' };
   const ZONES = d3.range(1, 12);
   const GROUPS = ['ศูนย์เอราวัณ', 'โรงพยาบาล', 'มูลนิธิ / กู้ชีพ'];
   const DIMS = ['combo', 'tambon', 'hour', 'dow', 'outcome', 'age', 'sex', 'cpr', 'care', 'hosp', 'cprout'];
@@ -721,7 +728,7 @@ button.it { cursor: pointer; }
   const LV7NAME = { Basic: 'BLS (Basic)', Advance: 'ALS (Advance)', ML: 'ML', CLS: 'CLS', FR: 'FR', ERB: 'ERB', 'ไม่ระบุ': 'ไม่ระบุระดับ' };
   const LV7C = { Basic: 'var(--lv-basic)', Advance: 'var(--lv-adv)', ML: 'var(--lv-ml)', CLS: 'var(--lv-cls)', FR: 'var(--lv-fr)', ERB: 'var(--lv-erb)', 'ไม่ระบุ': 'var(--lv-unk)' };
 
-  const C = () => ({ Basic: 'var(--lv-basic)', Advance: 'var(--lv-adv)', 'อื่นๆ': 'var(--lv-oth)', 'ไม่ระบุ': 'var(--lv-unk)' });
+  const C = () => ({ Basic: 'var(--lv-basic)', Advance: 'var(--lv-adv)', ML: 'var(--lv-ml)', 'อื่นๆ': 'var(--lv-oth)', 'ไม่ระบุ': 'var(--lv-unk)' });
 
   function el(tag, cls, text) {
     const e = document.createElement(tag);
@@ -787,7 +794,7 @@ button.it { cursor: pointer; }
       u.lv[r.level] = (u.lv[r.level] || 0) + n;
       u.total += n;
       let m = c.month.get(r.month);
-      if (!m) { m = { Basic: 0, Advance: 0, 'อื่นๆ': 0, 'ไม่ระบุ': 0, total: 0 }; c.month.set(r.month, m); }
+      if (!m) { m = { Basic: 0, Advance: 0, ML: 0, 'อื่นๆ': 0, 'ไม่ระบุ': 0, total: 0 }; c.month.set(r.month, m); }
       m[g4] += n;
       m.total += n;
       let gp = c.grp[grp];
@@ -803,7 +810,7 @@ button.it { cursor: pointer; }
       c.tr[r.dim].set(r.key, (c.tr[r.dim].get(r.key) || 0) + n);
       if (r.dim === 'hosp') {
         let h = c.hosp.get(r.key);
-        if (!h) { h = { Basic: 0, Advance: 0, 'อื่นๆ': 0, 'ไม่ระบุ': 0, total: 0 }; c.hosp.set(r.key, h); }
+        if (!h) { h = { Basic: 0, Advance: 0, ML: 0, 'อื่นๆ': 0, 'ไม่ระบุ': 0, total: 0 }; c.hosp.set(r.key, h); }
         h[g4] += n;
         h.total += n;
       }
@@ -811,7 +818,7 @@ button.it { cursor: pointer; }
     return c;
   }
   function g4of(lv) {
-    return { Basic: lv.Basic || 0, Advance: lv.Advance || 0, 'อื่นๆ': (lv.ML || 0) + (lv.CLS || 0) + (lv.FR || 0) + (lv.ERB || 0), 'ไม่ระบุ': lv['ไม่ระบุ'] || 0 };
+    return { Basic: lv.Basic || 0, Advance: lv.Advance || 0, ML: lv.ML || 0, 'อื่นๆ': (lv.CLS || 0) + (lv.FR || 0) + (lv.ERB || 0), 'ไม่ระบุ': lv['ไม่ระบุ'] || 0 };
   }
   const trv = (c1, dim, key) => c1.tr[dim].get(key) || 0;
   const cprAny = (c1) => d3.sum([...c1.tr.cpr.entries()], (e) => (/CPR|AED/.test(e[0]) ? e[1] : 0));
@@ -832,7 +839,7 @@ button.it { cursor: pointer; }
       box.appendChild(s);
     });
   }
-  const legG4 = (box) => legend(box, G4.map((k) => [k === 'อื่นๆ' ? 'อื่นๆ (ML · CLS · FR · ERB)' : k, C()[k]]));
+  const legG4 = (box) => legend(box, G4.map((k) => [k === 'อื่นๆ' ? 'อื่นๆ (CLS · FR · ERB)' : k, C()[k]]));
 
   function stackRow(name, parts, total, max) {
     const row = el('div', 'zx-row');
@@ -952,7 +959,7 @@ button.it { cursor: pointer; }
       ol.appendChild(x);
     };
     const oth = base.lv;
-    li('ภาพรวม', [dlabel(zone, sel) + ' มี ', { b: fmt(base.total) }, ' เคส: Basic ', { b: fmt(cnt.Basic) }, ' (' + share(cnt.Basic, base.total) + ') · Advance ', { b: fmt(cnt.Advance) }, ' (' + share(cnt.Advance, base.total) + ') · อื่นๆ ', { b: fmt(cnt['อื่นๆ']) }, ' (ML ' + fmt(oth.ML || 0) + ', CLS ' + fmt(oth.CLS || 0) + ', FR ' + fmt(oth.FR || 0) + ', ERB ' + fmt(oth.ERB || 0) + ') · ไม่ระบุระดับ ', { b: fmt(cnt['ไม่ระบุ']) }],
+    li('ภาพรวม', [dlabel(zone, sel) + ' มี ', { b: fmt(base.total) }, ' เคส: Basic ', { b: fmt(cnt.Basic) }, ' (' + share(cnt.Basic, base.total) + ') · Advance ', { b: fmt(cnt.Advance) }, ' (' + share(cnt.Advance, base.total) + ') · ML ', { b: fmt(cnt.ML) }, ' (' + share(cnt.ML, base.total) + ') · อื่นๆ ', { b: fmt(cnt['อื่นๆ']) }, ' (CLS ' + fmt(oth.CLS || 0) + ', FR ' + fmt(oth.FR || 0) + ', ERB ' + fmt(oth.ERB || 0) + ') · ไม่ระบุระดับ ', { b: fmt(cnt['ไม่ระบุ']) }],
       cnt.Advance ? 'เคส Basic มากกว่า Advance ประมาณ ' + d3.format('.1f')(cnt.Basic / cnt.Advance) + ' เท่า' : null);
 
     const dead = trv(cur, 'care', DEAD);
@@ -999,7 +1006,7 @@ button.it { cursor: pointer; }
       b.appendChild(l);
       b.appendChild(el('span', 'n', fmt(cnt[g])));
       let sub = share(cnt[g], base.total) + ' ของเคส';
-      if (g === 'อื่นๆ') sub = 'ML ' + fmt(base.lv.ML || 0) + ' · CLS ' + fmt(base.lv.CLS || 0) + ' · FR ' + fmt(base.lv.FR || 0) + ' · ERB ' + fmt(base.lv.ERB || 0);
+      if (g === 'อื่นๆ') sub = 'CLS ' + fmt(base.lv.CLS || 0) + ' · FR ' + fmt(base.lv.FR || 0) + ' · ERB ' + fmt(base.lv.ERB || 0);
       b.appendChild(el('span', 'p', sub));
       b.addEventListener('click', () => setLf(lf === g ? 'all' : g));
       box.appendChild(b);
@@ -1055,7 +1062,7 @@ button.it { cursor: pointer; }
       const sw = el('i', 'zx-sw'); sw.style.background = c[g];
       h.appendChild(sw); h.appendChild(document.createTextNode(g));
       th.appendChild(h);
-      if (g === 'อื่นๆ') th.appendChild(el('small', null, 'ML · CLS · FR · ERB'));
+      if (g === 'อื่นๆ') th.appendChild(el('small', null, 'CLS · FR · ERB'));
       tr.appendChild(th);
     });
     $('zx-bm').tHead.replaceChildren(tr);
@@ -1095,7 +1102,7 @@ button.it { cursor: pointer; }
       const row = el('tr');
       if (r[0] === 'grp') {
         row.className = 'grp';
-        const td = el('td', null, r[1]); td.colSpan = 5; row.appendChild(td);
+        const td = el('td', null, r[1]); td.colSpan = G4.length + 1; row.appendChild(td);
       } else {
         row.appendChild(el('td', 'lbl', r[0]));
         G4.forEach((g) => row.appendChild(el('td', lf === g ? 'hl' : null, cs[g].total ? r[1](cs[g]) : '—')));
@@ -1109,7 +1116,7 @@ button.it { cursor: pointer; }
     const byZone = zone === 'all';
     $('zx-cmp-h').textContent = byZone ? 'เปรียบเทียบ 11 โซน' : 'เปรียบเทียบเขตใน Zone ' + zone;
     $('zx-cmp-note').textContent = (lf === 'all' ? 'ทุกระดับหน่วย' : 'เฉพาะ ' + G4LONG[lf]) + ' · กดแถวเพื่อดูเฉพาะ' + (byZone ? 'โซน' : 'เขต') + 'นั้น · เปอร์เซ็นต์คิดจากเคสในแถวนั้น';
-    const heads = [byZone ? 'โซน' : 'เขต', 'เคสรวม', 'สัดส่วนระดับ', 'Basic', 'Advance', 'อื่นๆ', 'ไม่ระบุ', 'ผู้สูงอายุ', 'ทำ CPR/AED', 'เสียชีวิต ณ จุดเกิดเหตุ', 'นำส่งห้องฉุกเฉิน', 'ชุดรหัสอันดับ 1'];
+    const heads = [byZone ? 'โซน' : 'เขต', 'เคสรวม', 'สัดส่วนระดับ', 'Basic', 'Advance', 'ML', 'อื่นๆ', 'ไม่ระบุ', 'ผู้สูงอายุ', 'ทำ CPR/AED', 'เสียชีวิต ณ จุดเกิดเหตุ', 'นำส่งห้องฉุกเฉิน', 'ชุดรหัสอันดับ 1'];
     const tr = el('tr');
     heads.forEach((h) => tr.appendChild(el('th', null, h)));
     $('zx-cmp').tHead.replaceChildren(tr);
@@ -1273,7 +1280,7 @@ button.it { cursor: pointer; }
     $('zx-cpr-note').textContent = 'รอดชีวิต = ไม่ได้ลงว่าเสียชีวิต (นับรวมเคสที่ช่องผลการดูแลเบื้องต้นว่าง) · เสียชีวิตขณะนำส่งแยกไว้ต่างหาก · ร้อยละในแถบคิดจากเคสที่ทำ CPR วิธีนั้น · ' + dlabel(zone, sel) + (lf === 'all' ? '' : ' · ' + lf);
   }
 
-  const HCOLS = [['name', 'โรงพยาบาล'], ['Basic', 'Basic'], ['Advance', 'Advance'], ['อื่นๆ', 'อื่นๆ'], ['ไม่ระบุ', 'ไม่ระบุ'], ['total', 'รวม'], ['share', '% ของเคสที่นำส่ง']];
+  const HCOLS = [['name', 'โรงพยาบาล'], ['Basic', 'Basic'], ['Advance', 'Advance'], ['ML', 'ML'], ['อื่นๆ', 'อื่นๆ'], ['ไม่ระบุ', 'ไม่ระบุ'], ['total', 'รวม'], ['share', '% ของเคสที่นำส่ง']];
   function buildHospHead() {
     const tr = el('tr');
     tr.appendChild(el('th', null, 'เทียบ'));
@@ -1834,7 +1841,7 @@ button.it { cursor: pointer; }
     const base = cohort(zone, sel, 'all');
     const cnt = g4of(base.lv);
     $('zx-title').textContent = (org === 'erawan' ? 'รถศูนย์เอราวัณ · ' : '') + (zone === 'all' ? 'กรุงเทพมหานคร · ภาพรวม 11 โซน' : sel === 'all' ? 'Zone ' + zone + ' · ภาพรวม ' + (zoneDists.get(zone) || []).length + ' เขต' : 'Zone ' + zone + ' · เขต' + sel);
-    $('zx-sub').textContent = 'Basic ' + fmt(cnt.Basic) + ' · Advance ' + fmt(cnt.Advance) + ' · อื่นๆ ' + fmt(cnt['อื่นๆ']) + ' · ไม่ระบุ ' + fmt(cnt['ไม่ระบุ']) + ' จากทั้งหมด ' + fmt(base.total) + ' เคส' + (lf === 'all' ? '' : ' · กำลังดูเฉพาะ ' + G4LONG[lf]);
+    $('zx-sub').textContent = 'Basic ' + fmt(cnt.Basic) + ' · Advance ' + fmt(cnt.Advance) + ' · ML ' + fmt(cnt.ML) + ' · อื่นๆ ' + fmt(cnt['อื่นๆ']) + ' · ไม่ระบุ ' + fmt(cnt['ไม่ระบุ']) + ' จากทั้งหมด ' + fmt(base.total) + ' เคส' + (lf === 'all' ? '' : ' · กำลังดูเฉพาะ ' + G4LONG[lf]);
     renderSide();
     renderSummary();
     renderHero();
