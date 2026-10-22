@@ -40,7 +40,9 @@ img { max-width: 100%; }
 [hidden] { display: none !important; }
 {{CSS}}
 </style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 </head>
 <body>
 <div id="dash-root">
@@ -49,7 +51,7 @@ img { max-width: 100%; }
 <script>
 /* minimal stand-in for the Claude Dashboard `dash` API: loads data/<id>.json */
 (function () {
-  const ids = ['cases', 'traits', 'units', 'zones', 'screening', 'unitstats', 'hospstats', 'codes'];
+  const ids = ['cases', 'traits', 'units', 'zones', 'screening', 'unitstats', 'hospstats', 'codes', 'unitmap', 'colormap', 'geo'];
   const state = {};
   const subs = [];
   const fire = () => subs.forEach((fn) => fn());

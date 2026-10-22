@@ -349,14 +349,42 @@ button.it { cursor: pointer; }
 .zx-deadsplit .cap b { color: var(--color-fg); font-variant-numeric: tabular-nums; }
 @media (max-width: 820px) { .zx-cprkpi { grid-template-columns: minmax(0, 1fr); } }
 
+/* maps */
+.zx-map { position: relative; height: 26rem; border-radius: 12px; overflow: hidden; border: 1px solid var(--edge); background: color-mix(in srgb, #2f9e75 6%, var(--color-bg)); z-index: 0; }
+.zx-map > svg { display: block; width: 100%; height: 100%; }
+.zx-map path.d { cursor: pointer; stroke: color-mix(in srgb, var(--color-fg) 35%, transparent); stroke-width: .6; }
+.zx-map path.d.inz { stroke: var(--color-fg); stroke-width: 1.3; }
+.zx-map path.d.pick { stroke: var(--gold); stroke-width: 3; }
+.zx-map .lbl { font-size: 9px; fill: var(--color-fg); pointer-events: none; paint-order: stroke; stroke: var(--color-bg); stroke-width: 2.5px; }
+.zx-sel { display: flex; align-items: center; gap: .5rem; font-size: var(--cds-font-size-caption); min-width: 0; flex: 1; }
+.zx-sel select { font: inherit; flex: 1; min-width: 0; max-width: 100%; padding: .4rem .7rem; border: 1px solid var(--edge); border-radius: 99px; background: var(--color-bg); color: var(--color-fg); }
+.zx-chips { display: flex; flex-wrap: wrap; gap: .3rem; }
+.zx-chips button { font: inherit; font-size: var(--cds-font-size-caption); padding: .3rem .75rem; border-radius: 99px; border: 1px solid var(--edge); background: var(--color-bg); cursor: pointer; display: inline-flex; align-items: center; gap: .35rem; }
+.zx-chips button i { width: .65rem; height: .65rem; border-radius: 50%; }
+.zx-chips button[aria-pressed="true"] { background: var(--g900); color: #fff; border-color: transparent; }
+.zx-mleg { display: flex; align-items: center; gap: .6rem; font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); font-variant-numeric: tabular-nums; }
+.zx-mleg .ramp { flex: 1; max-width: 16rem; height: .6rem; border-radius: 99px; }
+.zx-mdet { display: flex; flex-direction: column; gap: .4rem; padding: .7rem .85rem; border-radius: 12px; background: color-mix(in srgb, var(--color-fg) 4%, var(--color-bg)); }
+.zx-mdet h3 { margin: 0; font-size: var(--cds-font-size-body); font-weight: 600; }
+.zx-mdet .zx-row.v { grid-template-columns: minmax(5rem, 9rem) minmax(0, 1fr) 6.2rem; }
+.zx-mapsrc { margin-top: -.4rem; }
+.zx-map .leaflet-container { font: inherit; }
+.zx-map .leaflet-tooltip { font-size: var(--cds-font-size-caption); }
+
 </style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 </head>
 <body>
 <div id="dash-root">
 <div class="zx" id="zx">
   <aside class="zx-side" aria-label="เลือกโซน เขต และระดับหน่วย">
     <div class="zx-brand">การออกเหตุรายโซน<small>ศูนย์เอราวัณ · กรุงเทพมหานคร 11 โซน</small></div>
+    <div>
+      <p class="zx-lab">หน่วยที่ออก</p>
+      <div class="zx-list" id="zx-org" data-source="cases units"></div>
+    </div>
     <div>
       <p class="zx-lab">โซน</p>
       <div class="zx-zonesel" id="zx-zones" data-source="cases"></div>
@@ -416,6 +444,34 @@ button.it { cursor: pointer; }
         <div class="zx-legend" id="zx-leg-cmp"></div>
         <div class="zx-tbl zx-cmp"><table id="zx-cmp"><thead></thead><tbody></tbody></table></div>
       </section>
+    </div>
+
+    <p class="zx-sec">แผนที่การออกเหตุ <small>ระดับเขต · พื้นที่เกิดเหตุจากคอลัมน์ อำเภอ และ ตำบล</small></p>
+    <div class="zx-grid">
+      <section class="zx-box zx-t2 zx-c6" id="zx-mapu-box" data-source="unitmap units geo zones" aria-labelledby="zx-mapu-h">
+        <span class="zx-role">แผนที่</span>
+        <h2 id="zx-mapu-h">หน่วยปฏิบัติการนี้ออกเหตุไปที่ไหน</h2>
+        <div class="zx-tools">
+          <label class="zx-sel"><span>หน่วย</span><select id="zx-mu" aria-label="เลือกหน่วยปฏิบัติการ"></select></label>
+        </div>
+        <p class="zx-note" id="zx-mu-sum"></p>
+        <div class="zx-map" id="zx-mapu" role="img" aria-label="แผนที่จำนวนเคสของหน่วยที่เลือก แยกตามเขตที่เกิดเหตุ"></div>
+        <div class="zx-mleg" id="zx-mapu-leg"></div>
+        <div class="zx-mdet" id="zx-mapu-det"></div>
+      </section>
+      <section class="zx-box zx-t2 zx-c6" id="zx-mapc-box" data-source="colormap geo zones" aria-labelledby="zx-mapc-h">
+        <span class="zx-role">แผนที่</span>
+        <h2 id="zx-mapc-h">ความหนาแน่นของการแจ้งเหตุ ตามรหัสสี</h2>
+        <div class="zx-tools">
+          <div class="zx-chips" id="zx-mc" role="group" aria-label="เลือกรหัสสี"></div>
+          <div class="zx-chips" id="zx-mm" role="group" aria-label="เลือกหน่วยวัด"></div>
+        </div>
+        <p class="zx-note" id="zx-mc-sum"></p>
+        <div class="zx-map" id="zx-mapc" role="img" aria-label="แผนที่ความหนาแน่นการแจ้งเหตุตามรหัสสี แยกตามเขต"></div>
+        <div class="zx-mleg" id="zx-mapc-leg"></div>
+        <div class="zx-mdet" id="zx-mapc-det"></div>
+      </section>
+      <p class="zx-note zx-c12 zx-mapsrc" id="zx-mapsrc">ขอบเขต 50 เขต: OpenGISData-Thailand (CC BY 4.0) · กดที่เขตบนแผนที่เพื่อดูรายแขวง · สีเข้ม = เคสมาก</p>
     </div>
 
     <p class="zx-sec">ผู้ป่วยและการนำส่ง <small>อายุ เพศ CPR ผลการดูแลเบื้องต้น โรงพยาบาลปลายทาง</small></p>
@@ -594,7 +650,7 @@ button.it { cursor: pointer; }
 <script>
 /* minimal stand-in for the Claude Dashboard `dash` API: loads data/<id>.json */
 (function () {
-  const ids = ['cases', 'traits', 'units', 'zones', 'screening', 'unitstats', 'hospstats', 'codes'];
+  const ids = ['cases', 'traits', 'units', 'zones', 'screening', 'unitstats', 'hospstats', 'codes', 'unitmap', 'colormap', 'geo'];
   const state = {};
   const subs = [];
   const fire = () => subs.forEach((fn) => fn());
@@ -635,6 +691,7 @@ button.it { cursor: pointer; }
   const wrap = $('zx');
   const tipEl = $('zx-tip');
   let zone = 'all';
+  let org = 'all';  // 'all' = ทุกหน่วย, 'erawan' = เฉพาะรถศูนย์เอราวัณ
   let sel = 'all';
   let lf = 'all';
   let sort = { k: 'total', dir: -1 };
@@ -650,6 +707,14 @@ button.it { cursor: pointer; }
   const cname = (k) => { const m = /^(\d+)/.exec(k); return m ? codeName.get(m[1]) || '' : ''; };
   const clabel = (k) => (cname(k) ? k + ' ' + cname(k) : k);
   let ustats = [];
+  let unitmap = [];
+  let colormap = [];
+  let geo = [];
+  let mapUnit = null;
+  let mapColor = 'all';
+  let mapMetric = 'n';
+  const mapPick = { u: null, c: null };
+  const maps = {};
   let hstats = [];
   const picks = { unit: [], hosp: [] };
   const LV7 = ['Basic', 'Advance', 'ML', 'CLS', 'FR', 'ERB', 'ไม่ระบุ'];
@@ -670,7 +735,7 @@ button.it { cursor: pointer; }
   }
   const short = (s) => s.replace(/^ศูนย์บริการการแพทย์ฉุกเฉินกรุงเทพมหานคร \(ศูนย์เอราวัณ\)/, 'เอราวัณ');
   const zlabel = (z) => (z === 'all' ? 'ทั้ง กทม. (11 โซน)' : 'Zone ' + z);
-  const dlabel = (z, d) => (d === 'all' ? zlabel(z) : 'Zone ' + z + ' · เขต' + d);
+  const dlabel = (z, d) => (d === 'all' ? zlabel(z) : 'Zone ' + z + ' · เขต' + d) + (org === 'erawan' ? ' · เฉพาะรถศูนย์เอราวัณ' : '');
   const hh = (h) => String(h).padStart(2, '0') + ':00–' + String(h).padStart(2, '0') + ':59';
   const share = (n, d) => (d ? pct(n / d) : '—');
 
@@ -703,7 +768,9 @@ button.it { cursor: pointer; }
   }
 
   /* data */
-  const inScope = (r, z, d) => (z === 'all' || +r.zone === z) && (d === 'all' || r.district === d);
+  const isErawan = (r) => (r.org ? r.org === 'erawan' : (groupOf.get(r.unit) || '') === 'ศูนย์เอราวัณ');
+  const orgOk = (r) => org === 'all' || isErawan(r);
+  const inScope = (r, z, d) => orgOk(r) && (z === 'all' || +r.zone === z) && (d === 'all' || r.district === d);
   function cohort(z, d, g) {
     const c = { total: 0, lv: {}, unit: new Map(), month: new Map(), grp: {}, tr: {}, hosp: new Map() };
     DIMS.forEach((k) => { c.tr[k] = new Map(); });
@@ -818,13 +885,21 @@ button.it { cursor: pointer; }
   function renderSide() {
     const zc = {}, dc = {};
     let all = 0;
+    let erw = 0, every = 0;
     cases.forEach((r) => {
       if (lf !== 'all' && G4OF[r.level] !== lf) return;
       const n = +r.n;
+      every += n;
+      if (isErawan(r)) erw += n;
+      if (!orgOk(r)) return;
       all += n;
       zc[r.zone] = (zc[r.zone] || 0) + n;
       if (zone !== 'all' && +r.zone === zone) dc[r.district] = (dc[r.district] || 0) + n;
     });
+    const ob = $('zx-org');
+    ob.replaceChildren();
+    mkItem(ob, 'ทุกหน่วย', every, org === 'all', () => setOrg('all'));
+    mkItem(ob, 'เฉพาะรถศูนย์เอราวัณ', erw, org === 'erawan', () => setOrg(org === 'erawan' ? 'all' : 'erawan'), { sw: 'var(--gold)' });
     const zb = $('zx-zones');
     zb.replaceChildren();
     mkItem(zb, 'ทั้ง กทม.', all, zone === 'all', () => setZone('all'), { cls: 'zx-all' });
@@ -1510,6 +1585,180 @@ button.it { cursor: pointer; }
     });
   }
 
+  /* maps: OpenStreetMap + Leaflet when available (GitHub Pages), plain SVG otherwise */
+  const RAMPS = {
+    unit: ['#f1efe3', '#0e3b2c'],
+    all: ['#eee8f6', '#43277a'],
+    'แดง': ['#fde3e0', '#a3121c'],
+    'เหลือง': ['#fff4cc', '#a86b00'],
+    'เขียว': ['#e3f4df', '#17703a'],
+    'ขาว': ['#eef0f2', '#46525c']
+  };
+  const MCOLORS = [['all', 'ทุกรหัสสี', '#6a4c9c'], ['แดง', 'แดง', '#c8323c'], ['เหลือง', 'เหลือง', '#d9a21b'], ['เขียว', 'เขียว', '#2f8a4a'], ['ขาว', 'ขาว', '#9aa4ad']];
+  /* d3 wants clockwise outer rings (RFC 7946 GeoJSON is counter-clockwise); flip any polygon d3 reads as the whole globe */
+  function d3Wind(g) {
+    const fix = (poly) => (d3.geoArea({ type: 'Polygon', coordinates: poly }) > 2 * Math.PI ? poly.map((ring) => ring.slice().reverse()) : poly);
+    if (g.type === 'Polygon') return { type: 'Polygon', coordinates: fix(g.coordinates) };
+    if (g.type === 'MultiPolygon') return { type: 'MultiPolygon', coordinates: g.coordinates.map(fix) };
+    return g;
+  }
+  function zonesOf(d) {
+    const zs = [];
+    zoneDists.forEach((list, z) => { if (list.some((e) => e.district === d)) zs.push(z); });
+    return zs;
+  }
+  function inZoneScope(d) { return zone === 'all' || zonesOf(d).includes(zone); }
+  function mapRender(id, o) {
+    const box = $(id);
+    const fc = { type: 'FeatureCollection', features: geo.map((g) => ({ type: 'Feature', properties: { district: g.district }, geometry: g.geometry })) };
+    const max = d3.max(o.values.values()) || 1;
+    const scale = d3.scaleSequentialSqrt(d3.interpolateRgb(o.ramp[0], o.ramp[1])).domain([0, max]);
+    const fill = (d) => { const v = o.values.get(d) || 0; return v > 0 ? scale(v) : 'transparent'; };
+    const fmtV = o.fmtV || fmt;
+    const tipLines = (d) => [[fill(d) === 'transparent' ? null : fill(d), fmtV(o.values.get(d) || 0) + ' ' + o.unitLabel], [null, 'โซน ' + (zonesOf(d).join(' / ') || '—')]];
+    let m = maps[id];
+    if (window.L) {
+      if (!m) {
+        box.replaceChildren();
+        const map = L.map(box, { scrollWheelZoom: false, zoomSnap: 0.25 });
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors · ขอบเขตเขต OpenGISData-Thailand (CC BY 4.0)' }).addTo(map);
+        const layer = L.geoJSON(fc).addTo(map);
+        m = maps[id] = { map, layer, fitKey: null };
+      }
+      m.layer.eachLayer((ly) => {
+        const d = ly.feature.properties.district;
+        const pick = o.pick === d, inz = zone !== 'all' && inZoneScope(d);
+        ly.setStyle({ fillColor: fill(d) === 'transparent' ? '#ffffff' : fill(d), fillOpacity: fill(d) === 'transparent' ? 0.05 : 0.72, color: pick ? '#e3b341' : inz ? '#0e3b2c' : '#3d4a44', weight: pick ? 3.5 : inz ? 2 : 0.8, opacity: 0.9 });
+        ly.unbindTooltip();
+        ly.bindTooltip('<b>เขต' + d + '</b><br>' + fmtV(o.values.get(d) || 0) + ' ' + o.unitLabel + '<br>โซน ' + (zonesOf(d).join(' / ') || '—'), { sticky: true });
+        ly.off('click');
+        ly.on('click', () => o.onPick(d));
+        if (pick) ly.bringToFront();
+      });
+      const key = zone + '|' + box.clientWidth;
+      if (m.fitKey !== key) {
+        const sel = m.layer.getLayers().filter((ly) => inZoneScope(ly.feature.properties.district));
+        const b = L.featureGroup(sel.length ? sel : m.layer.getLayers()).getBounds();
+        m.map.invalidateSize();
+        m.map.fitBounds(b, { padding: [8, 8] });
+        m.fitKey = key;
+      }
+      return;
+    }
+    box.replaceChildren();
+    const W = box.clientWidth, H = box.clientHeight;
+    if (!W || !H) return;
+    const focus = { type: 'FeatureCollection', features: fc.features.filter((f) => inZoneScope(f.properties.district)) };
+    const proj = d3.geoMercator().fitExtent([[8, 8], [W - 8, H - 8]], focus.features.length ? focus : fc);
+    const path = d3.geoPath(proj);
+    const svg = d3.select(box).append('svg').attr('viewBox', '0 0 ' + W + ' ' + H);
+    const feats = fc.features.slice().sort((a, b) => (o.pick === a.properties.district) - (o.pick === b.properties.district));
+    feats.forEach((f) => {
+      const d = f.properties.district;
+      const p = svg.append('path').attr('d', path(f)).attr('class', 'd' + (zone !== 'all' && inZoneScope(d) ? ' inz' : '') + (o.pick === d ? ' pick' : '')).style('fill', fill(d));
+      p.on('mouseenter', (e) => showTip(e, 'เขต' + d, tipLines(d))).on('mousemove', moveTip).on('mouseleave', hideTip).on('click', () => { hideTip(); o.onPick(d); });
+    });
+    if (zone !== 'all') {
+      focus.features.forEach((f) => {
+        const c = path.centroid(f);
+        if (isFinite(c[0])) svg.append('text').attr('class', 'lbl').attr('x', c[0]).attr('y', c[1]).attr('text-anchor', 'middle').text(f.properties.district);
+      });
+    }
+  }
+  function mapLegend(id, ramp, max, label, fmtV) {
+    const box = $(id);
+    box.replaceChildren();
+    const r = el('span', 'ramp');
+    const it = d3.interpolateRgb(ramp[0], ramp[1]);
+    r.style.background = 'linear-gradient(90deg,' + d3.range(0, 1.01, 0.25).map((t) => it(t)).join(',') + ')';
+    box.append(el('span', null, '0'), r, el('span', null, (fmtV || fmt)(max) + ' ' + label));
+  }
+  function mapDetail(id, d, title, rows, base, color) {
+    const box = $(id);
+    box.replaceChildren();
+    if (!d) { box.appendChild(el('span', 'zx-note', 'กดที่เขตบนแผนที่เพื่อดูรายแขวง')); return; }
+    box.appendChild(el('h3', null, title));
+    const list = el('div', 'zx-rows');
+    box.appendChild(list);
+    if (!rows.length) { list.appendChild(el('span', 'zx-note', 'ไม่มีเคสในเขตนี้')); return; }
+    valRows(list, rows, base, color);
+  }
+
+  function renderMaps() {
+    if (!geo.length) return;
+    const lvOk = (r) => orgOk(r) && (lf === 'all' || G4OF[r.level] === lf);
+    // unit map
+    const tot = new Map();
+    // หน่วยเรียงตามเคสในพื้นที่ที่เลือกบน sidebar (โซน/เขต) แต่แผนที่แสดงทั้ง กทม.
+    const here = (d) => (sel !== 'all' ? d === sel : inZoneScope(d));
+    unitmap.forEach((r) => { if (lvOk(r) && here(r.district)) tot.set(r.unit, (tot.get(r.unit) || 0) + +r.n); });
+    const ulist = [...tot.entries()].sort((a, b) => b[1] - a[1]);
+    if (!mapUnit || !tot.has(mapUnit)) mapUnit = ulist.length ? ulist[0][0] : null;
+    const sel1 = $('zx-mu');
+    sel1.replaceChildren();
+    ulist.forEach(([u, n]) => { const op = el('option', null, short(u) + ' (' + fmt(n) + (zone === 'all' && sel === 'all' ? '' : ' ใน' + (sel !== 'all' ? 'เขต' + sel : ' Zone ' + zone)) + ')'); op.value = u; op.selected = u === mapUnit; sel1.appendChild(op); });
+    const uv = new Map();
+    const ut = new Map();
+    unitmap.forEach((r) => {
+      if (r.unit !== mapUnit || !lvOk(r)) return;
+      uv.set(r.district, (uv.get(r.district) || 0) + +r.n);
+      if (r.district === mapPick.u) ut.set(r.tambon, (ut.get(r.tambon) || 0) + +r.n);
+    });
+    const uTot = d3.sum(uv.values());
+    const byZone = new Map();
+    uv.forEach((n, d) => zonesOf(d).forEach((z) => byZone.set(z, (byZone.get(z) || 0) + n / zonesOf(d).length)));
+    const topD = top(uv, 3).map((x) => x[0] + ' ' + fmt(x[1])).join(' · ');
+    const topZ = top(byZone, 1)[0];
+    $('zx-mu-sum').textContent = mapUnit ? short(mapUnit) + ' ออกเหตุ ' + fmt(uTot) + ' เคส ใน ' + fmt(uv.size) + ' จาก 50 เขต' + (topZ ? ' · ' + share(topZ[1], uTot) + ' อยู่ใน Zone ' + topZ[0] : '') + ' · มากสุด: ' + (topD || '—') + (lf === 'all' ? '' : ' · เฉพาะ ' + lf) : 'ไม่มีหน่วยในตัวกรองนี้';
+    mapRender('zx-mapu', { values: uv, ramp: RAMPS.unit, unitLabel: 'เคส', pick: mapPick.u, onPick: (d) => { mapPick.u = mapPick.u === d ? null : d; renderMaps(); } });
+    mapLegend('zx-mapu-leg', RAMPS.unit, d3.max(uv.values()) || 0, 'เคสต่อเขต');
+    mapDetail('zx-mapu-det', mapPick.u, 'เขต' + mapPick.u + ' · ' + fmt(uv.get(mapPick.u) || 0) + ' เคส (' + share(uv.get(mapPick.u) || 0, uTot) + ' ของหน่วยนี้)', top(ut, 12).map((x) => ({ label: x[0], v: x[1] })), uv.get(mapPick.u) || 0);
+
+    // color density map
+    const chips = $('zx-mc');
+    chips.replaceChildren();
+    MCOLORS.forEach(([k, label, c]) => {
+      const b = el('button');
+      b.type = 'button';
+      b.setAttribute('aria-pressed', String(mapColor === k));
+      const i = el('i'); i.style.background = c;
+      b.append(i, document.createTextNode(label));
+      b.addEventListener('click', () => { mapColor = k; renderMaps(); });
+      chips.appendChild(b);
+    });
+    const mm = $('zx-mm');
+    mm.replaceChildren();
+    [['n', 'จำนวนเคส'], ['km2', 'ต่อ ตร.กม.']].forEach(([k, label]) => {
+      const b = el('button', null, label);
+      b.type = 'button';
+      b.setAttribute('aria-pressed', String(mapMetric === k));
+      b.addEventListener('click', () => { mapMetric = k; renderMaps(); });
+      mm.appendChild(b);
+    });
+    const area = new Map(geo.map((g) => [g.district, g.area]));
+    const cv = new Map();
+    const ct = new Map();
+    colormap.forEach((r) => {
+      if (!lvOk(r) || (mapColor !== 'all' && r.color !== mapColor)) return;
+      cv.set(r.district, (cv.get(r.district) || 0) + +r.n);
+      if (r.district === mapPick.c) ct.set(r.tambon, (ct.get(r.tambon) || 0) + +r.n);
+    });
+    const cTot = d3.sum(cv.values());
+    const vals = mapMetric === 'n' ? cv : new Map([...cv.entries()].map(([d, n]) => [d, area.get(d) ? n / area.get(d) : 0]));
+    const f1 = d3.format(',.1f');
+    const fmtV = mapMetric === 'n' ? fmt : f1;
+    const label = mapMetric === 'n' ? 'เคส' : 'เคส/ตร.กม.';
+    const ramp = RAMPS[mapColor];
+    const topC = top(vals, 3).map((x) => x[0] + ' ' + fmtV(x[1])).join(' · ');
+    const cname1 = mapColor === 'all' ? 'ทุกรหัสสี' : 'รหัส' + mapColor;
+    $('zx-mc-sum').textContent = cname1 + ' ' + fmt(cTot) + ' เคส · เขตที่หนาแน่นสุด (' + label + '): ' + (topC || '—') + (lf === 'all' ? '' : ' · เฉพาะ ' + lf);
+    mapRender('zx-mapc', { values: vals, ramp, unitLabel: label, fmtV, pick: mapPick.c, onPick: (d) => { mapPick.c = mapPick.c === d ? null : d; renderMaps(); } });
+    mapLegend('zx-mapc-leg', ramp, d3.max(vals.values()) || 0, label, fmtV);
+    const dn = cv.get(mapPick.c) || 0;
+    mapDetail('zx-mapc-det', mapPick.c, 'เขต' + mapPick.c + ' · ' + cname1 + ' ' + fmt(dn) + ' เคส' + (area.get(mapPick.c) ? ' · ' + f1(dn / area.get(mapPick.c)) + ' เคส/ตร.กม.' : ''), top(ct, 12).map((x) => ({ label: x[0], v: x[1] })), dn, ramp[1]);
+    $('zx-mapsrc').textContent = (window.L ? 'แผนที่พื้นหลัง © OpenStreetMap contributors · ' : 'แผนที่พื้นหลัง OpenStreetMap แสดงในเวอร์ชันเว็บ (GitHub Pages) · ') + 'ขอบเขต 50 เขต: OpenGISData-Thailand (CC BY 4.0) · กดที่เขตบนแผนที่เพื่อดูรายแขวง · สีเข้ม = เคสมาก';
+  }
+
   function renderFlow() {
     const f = dash.data('screening');
     const tb = $('zx-flow').tBodies[0];
@@ -1523,12 +1772,13 @@ button.it { cursor: pointer; }
     });
   }
 
-  function setZone(z) { zone = z; sel = 'all'; draw(); }
-  function setSel(d) { sel = d; draw(); }
+  function setOrg(o) { org = o; mapUnit = null; picks.unit = picks.unit.filter((u) => o === 'all' || (groupOf.get(u) || '') === 'ศูนย์เอราวัณ'); draw(); }
+  function setZone(z) { zone = z; sel = 'all'; mapUnit = null; draw(); }
+  function setSel(d) { sel = d; mapUnit = null; draw(); }
   function setLf(g) { lf = g; draw(); }
 
   function draw() {
-    const ds = ['cases', 'traits', 'units', 'zones', 'unitstats', 'hospstats', 'codes'].map((k) => dash.data(k));
+    const ds = ['cases', 'traits', 'units', 'zones', 'unitstats', 'hospstats', 'codes', 'unitmap', 'colormap', 'geo'].map((k) => dash.data(k));
     const err = $('zx-err');
     if (ds.some((d) => d.status !== 'ok')) {
       err.hidden = ds.some((d) => d.status === 'loading');
@@ -1540,6 +1790,9 @@ button.it { cursor: pointer; }
     groupOf = new Map(ds[2].data.map((r) => [r.unit, r.group]));
     codeName = new Map(ds[6].data.map((r) => [String(r.code), r.name]));
     ustats = ds[4].data;
+    unitmap = ds[7].data;
+    colormap = ds[8].data;
+    geo = ds[9].data.map((r) => ({ district: r.district, area: +r.area, geometry: d3Wind(typeof r.geometry === 'string' ? JSON.parse(r.geometry) : r.geometry) }));
     hstats = ds[5].data;
     zoneDists = new Map();
     ds[3].data.forEach((r) => {
@@ -1550,7 +1803,7 @@ button.it { cursor: pointer; }
     nMonths = new Set(cases.map((x) => x.month)).size || 11;
     const base = cohort(zone, sel, 'all');
     const cnt = g4of(base.lv);
-    $('zx-title').textContent = zone === 'all' ? 'กรุงเทพมหานคร · ภาพรวม 11 โซน' : sel === 'all' ? 'Zone ' + zone + ' · ภาพรวม ' + (zoneDists.get(zone) || []).length + ' เขต' : 'Zone ' + zone + ' · เขต' + sel;
+    $('zx-title').textContent = (org === 'erawan' ? 'รถศูนย์เอราวัณ · ' : '') + (zone === 'all' ? 'กรุงเทพมหานคร · ภาพรวม 11 โซน' : sel === 'all' ? 'Zone ' + zone + ' · ภาพรวม ' + (zoneDists.get(zone) || []).length + ' เขต' : 'Zone ' + zone + ' · เขต' + sel);
     $('zx-sub').textContent = 'Basic ' + fmt(cnt.Basic) + ' · Advance ' + fmt(cnt.Advance) + ' · อื่นๆ ' + fmt(cnt['อื่นๆ']) + ' · ไม่ระบุ ' + fmt(cnt['ไม่ระบุ']) + ' จากทั้งหมด ' + fmt(base.total) + ' เคส' + (lf === 'all' ? '' : ' · กำลังดูเฉพาะ ' + G4LONG[lf]);
     renderSide();
     renderSummary();
@@ -1565,10 +1818,12 @@ button.it { cursor: pointer; }
     renderTable();
     renderFlow();
     renderCodes();
+    renderMaps();
   }
 
   buildHead();
   buildHospHead();
+  $('zx-mu').addEventListener('change', (e) => { mapUnit = e.target.value; mapPick.u = null; renderMaps(); });
   $('zx-q').addEventListener('input', (e) => { query = e.target.value; if (cases.length) renderTable(); });
   $('zx-hq').addEventListener('input', (e) => { hquery = e.target.value; if (cases.length) renderHosp(cohort(zone, sel, lf)); });
   dash.onData(draw);

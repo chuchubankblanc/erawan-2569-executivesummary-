@@ -180,6 +180,7 @@ def main():
     UMET = ('n', 'found', 'transported', 'old', 'cpr', 'dead', 'red')
     HMET = ('n', 'old', 'cpr', 'red', 'erawan')
     ustats = defaultdict(lambda: dict.fromkeys(UMET, 0))
+    unitmap, colormap = Counter(), Counter()
     hstats = defaultdict(lambda: dict.fromkeys(HMET, 0))
     oddity = Counter()
     for r in df.to_dict('records'):
@@ -217,17 +218,21 @@ def main():
                 oddity['อายุเกิน 120 ปี (นับเป็นไม่ระบุ)'] += 1
         except ValueError:
             oddity['อายุไม่ใช่ตัวเลข (นับเป็นไม่ระบุ)'] += 1
+        org = 'erawan' if ERAWAN in u else 'other'  # รถศูนย์เอราวัณ หรือหน่วยอื่น
         for k, v in dims.items():
-            traits[(z, d, lv, k, v)] += 1
+            traits[(z, d, lv, org, k, v)] += 1
         # ตัวชี้วัดสำหรับ benchmark รายหน่วย / รายโรงพยาบาล
         flags = {'n': 1, 'found': dims['outcome'] == 'พบเหตุ', 'transported': dims['hosp'] != 'ไม่ได้นำส่ง / ไม่มีบันทึก',
                  'old': dims['age'] == 'ผู้สูงอายุ', 'cpr': cpr in ('CPR', 'CPR + AED/DF', 'AED/DF อย่างเดียว'),
                  'dead': dims['care'] == 'เสียชีวิต ณ จุดเกิดเหตุ', 'red': clean(r['color']) == 'แดง', 'erawan': ERAWAN in u}
+        # แผนที่: หน่วย x พื้นที่เกิดเหตุ และรหัสสี x พื้นที่เกิดเหตุ
+        unitmap[(d, dims['tambon'], u, lv)] += 1
+        colormap[(d, dims['tambon'], lv, org, clean(r['color']) or 'ไม่ระบุ')] += 1
         us = ustats[(z, d, lv, u)]
         for k in UMET:
             us[k] += int(flags[k])
         if flags['transported']:
-            hs = hstats[(z, d, lv, dims['hosp'])]
+            hs = hstats[(z, d, lv, org, dims['hosp'])]
             for k in HMET:
                 hs[k] += int(flags[k])
 
@@ -236,12 +241,16 @@ def main():
 
     dump('cases.json', [{'zone': z, 'district': d, 'month': m, 'level': lv, 'unit': u, 'n': n}
                         for (z, d, m, lv, u), n in sorted(cases.items())])
-    dump('traits.json', [{'zone': z, 'district': d, 'level': lv, 'dim': k, 'key': v, 'n': n}
-                         for (z, d, lv, k, v), n in sorted(traits.items())])
+    dump('traits.json', [{'zone': z, 'district': d, 'level': lv, 'org': o, 'dim': k, 'key': v, 'n': n}
+                         for (z, d, lv, o, k, v), n in sorted(traits.items())])
     dump('unitstats.json', [dict(zone=z, district=d, level=lv, unit=u, **m) for (z, d, lv, u), m in sorted(ustats.items())])
-    dump('hospstats.json', [dict(zone=z, district=d, level=lv, hosp=h, **m) for (z, d, lv, h), m in sorted(hstats.items())])
+    dump('hospstats.json', [dict(zone=z, district=d, level=lv, org=o, hosp=h, **m) for (z, d, lv, o, h), m in sorted(hstats.items())])
     with open(ROOT / 'config' / 'symptom_codes.csv', encoding='utf-8-sig') as f:
         dump('codes.json', [{'code': r['code'], 'name': r['name']} for r in csv.DictReader(f)])
+    dump('unitmap.json', [{'district': d, 'tambon': t, 'unit': u, 'level': lv, 'n': n} for (d, t, u, lv), n in sorted(unitmap.items())])
+    dump('colormap.json', [{'district': d, 'tambon': t, 'level': lv, 'org': o, 'color': c, 'n': n} for (d, t, lv, o, c), n in sorted(colormap.items())])
+    geo = json.loads((ROOT / 'config' / 'geo' / 'bkk_districts.geojson').read_text(encoding='utf-8'))
+    dump('geo.json', [{'district': f['properties']['district'], 'area': round(f['properties']['area'], 3), 'geometry': f['geometry']} for f in geo['features']])
     dump('units.json', [{'unit': u, 'group': g} for u, g in sorted(units.items())])
     dump('screening.json', steps)
     dump('zones.json', [{'zone': z, 'district': e['district'], 'tambons': '' if e['tambons'] is None else ', '.join(e['tambons'])}

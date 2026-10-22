@@ -24,6 +24,7 @@ python scripts/build_site.py                                   # ประกอ
 | `scripts/build_data.py` | คัดเคสและสรุปข้อมูล |
 | `scripts/build_site.py` | ประกอบหน้าเว็บ (`docs/index.html`) หรือหน้า Claude Dashboard (`--artifact`) |
 | `src/` | style.css · body.html · app.js (ใช้ร่วมกันทั้ง GitHub Pages และ Claude Dashboard) |
+| `config/geo/` | ขอบเขต 50 เขต (OpenGISData-Thailand, CC BY 4.0) สำหรับแผนที่ |
 | `docs/` | เว็บที่ deploy (index.html, data/*.json, assets/) |
 
 ## นิยามหลัก
@@ -33,3 +34,5 @@ python scripts/build_site.py                                   # ประกอ
 - Basic = BLS · Advance = ALS · อื่นๆ = ML + CLS + FR + ERB · ไม่ระบุ = ช่องระดับว่าง
 - กลุ่มอายุ: เด็ก 0–14 ปี · ผู้ใหญ่ 15–59 ปี · ผู้สูงอายุ 60 ปีขึ้นไป · อายุ 0/ว่าง/เกิน 120 = ไม่ระบุ
 - เพศ 0/ว่าง = ไม่ระบุ · CPR: Yes / Yes,AED/DF / AED/DF / No · โรงพยาบาล 0/ว่าง = ไม่ได้นำส่ง/ไม่มีบันทึก
+- แผนที่: ระดับเขต (50 เขต) จากพื้นที่เกิดเหตุ (คอลัมน์ อำเภอ / ตำบล) — เวอร์ชันเว็บใช้พื้นหลัง OpenStreetMap ผ่าน Leaflet
+- ตัวกรอง "เฉพาะรถศูนย์เอราวัณ" = หน่วยที่ออกปฏิบัติการชื่อมี "ศูนย์เอราวัณ" (ทุกจุดจอด)

@@ -2,6 +2,10 @@
   <aside class="zx-side" aria-label="เลือกโซน เขต และระดับหน่วย">
     <div class="zx-brand">การออกเหตุรายโซน<small>ศูนย์เอราวัณ · กรุงเทพมหานคร 11 โซน</small></div>
     <div>
+      <p class="zx-lab">หน่วยที่ออก</p>
+      <div class="zx-list" id="zx-org" data-source="cases units"></div>
+    </div>
+    <div>
       <p class="zx-lab">โซน</p>
       <div class="zx-zonesel" id="zx-zones" data-source="cases"></div>
     </div>
@@ -60,6 +64,34 @@
         <div class="zx-legend" id="zx-leg-cmp"></div>
         <div class="zx-tbl zx-cmp"><table id="zx-cmp"><thead></thead><tbody></tbody></table></div>
       </section>
+    </div>
+
+    <p class="zx-sec">แผนที่การออกเหตุ <small>ระดับเขต · พื้นที่เกิดเหตุจากคอลัมน์ อำเภอ และ ตำบล</small></p>
+    <div class="zx-grid">
+      <section class="zx-box zx-t2 zx-c6" id="zx-mapu-box" data-source="unitmap units geo zones" aria-labelledby="zx-mapu-h">
+        <span class="zx-role">แผนที่</span>
+        <h2 id="zx-mapu-h">หน่วยปฏิบัติการนี้ออกเหตุไปที่ไหน</h2>
+        <div class="zx-tools">
+          <label class="zx-sel"><span>หน่วย</span><select id="zx-mu" aria-label="เลือกหน่วยปฏิบัติการ"></select></label>
+        </div>
+        <p class="zx-note" id="zx-mu-sum"></p>
+        <div class="zx-map" id="zx-mapu" role="img" aria-label="แผนที่จำนวนเคสของหน่วยที่เลือก แยกตามเขตที่เกิดเหตุ"></div>
+        <div class="zx-mleg" id="zx-mapu-leg"></div>
+        <div class="zx-mdet" id="zx-mapu-det"></div>
+      </section>
+      <section class="zx-box zx-t2 zx-c6" id="zx-mapc-box" data-source="colormap geo zones" aria-labelledby="zx-mapc-h">
+        <span class="zx-role">แผนที่</span>
+        <h2 id="zx-mapc-h">ความหนาแน่นของการแจ้งเหตุ ตามรหัสสี</h2>
+        <div class="zx-tools">
+          <div class="zx-chips" id="zx-mc" role="group" aria-label="เลือกรหัสสี"></div>
+          <div class="zx-chips" id="zx-mm" role="group" aria-label="เลือกหน่วยวัด"></div>
+        </div>
+        <p class="zx-note" id="zx-mc-sum"></p>
+        <div class="zx-map" id="zx-mapc" role="img" aria-label="แผนที่ความหนาแน่นการแจ้งเหตุตามรหัสสี แยกตามเขต"></div>
+        <div class="zx-mleg" id="zx-mapc-leg"></div>
+        <div class="zx-mdet" id="zx-mapc-det"></div>
+      </section>
+      <p class="zx-note zx-c12 zx-mapsrc" id="zx-mapsrc">ขอบเขต 50 เขต: OpenGISData-Thailand (CC BY 4.0) · กดที่เขตบนแผนที่เพื่อดูรายแขวง · สีเข้ม = เคสมาก</p>
     </div>
 
     <p class="zx-sec">ผู้ป่วยและการนำส่ง <small>อายุ เพศ CPR ผลการดูแลเบื้องต้น โรงพยาบาลปลายทาง</small></p>
