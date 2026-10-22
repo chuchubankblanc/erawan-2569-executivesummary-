@@ -923,12 +923,41 @@
     'ขาว': ['#eef0f2', '#46525c']
   };
   const MCOLORS = [['all', 'ทุกรหัสสี', '#6a4c9c'], ['แดง', 'แดง', '#c8323c'], ['เหลือง', 'เหลือง', '#d9a21b'], ['เขียว', 'เขียว', '#2f8a4a'], ['ขาว', 'ขาว', '#9aa4ad']];
-  /* d3 wants clockwise outer rings (RFC 7946 GeoJSON is counter-clockwise); flip any polygon d3 reads as the whole globe */
-  function d3Wind(g) {
-    const fix = (poly) => (d3.geoArea({ type: 'Polygon', coordinates: poly }) > 2 * Math.PI ? poly.map((ring) => ring.slice().reverse()) : poly);
-    if (g.type === 'Polygon') return { type: 'Polygon', coordinates: fix(g.coordinates) };
-    if (g.type === 'MultiPolygon') return { type: 'MultiPolygon', coordinates: g.coordinates.map(fix) };
-    return g;
+  /* map helpers written without d3-geo (the Claude Dashboard build of d3 has no geo module) */
+  function lerpHex(a, b) {
+    const p = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+    const A = p(a), B = p(b);
+    return (t) => '#' + A.map((v, i) => Math.round(v + (B[i] - v) * Math.max(0, Math.min(1, t))).toString(16).padStart(2, '0')).join('');
+  }
+  const polys = (g) => (g.type === 'Polygon' ? [g.coordinates] : g.type === 'MultiPolygon' ? g.coordinates : []);
+  const mercY = (lat) => Math.log(Math.tan(Math.PI / 4 + lat * Math.PI / 360));
+  /* Mercator fitted to the features' bounds inside [pad, W-pad] x [pad, H-pad] */
+  function fitProjection(features, W, H, pad) {
+    let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+    features.forEach((f) => polys(f.geometry).forEach((poly) => poly[0].forEach(([lon, lat]) => {
+      const y = mercY(lat);
+      if (lon < x0) x0 = lon; if (lon > x1) x1 = lon; if (y < y0) y0 = y; if (y > y1) y1 = y;
+    })));
+    const kx = (x1 - x0) * Math.PI / 180;
+    const k = Math.min((W - 2 * pad) / (kx || 1), (H - 2 * pad) / ((y1 - y0) || 1));
+    const ox = (W - kx * k) / 2, oy = (H - (y1 - y0) * k) / 2;
+    const pt = ([lon, lat]) => [ox + (lon - x0) * Math.PI / 180 * k, oy + (y1 - mercY(lat)) * k];
+    return {
+      path: (f) => polys(f.geometry).map((poly) => poly.map((ring) => 'M' + ring.map((c) => pt(c).map((v) => v.toFixed(1)).join(',')).join('L') + 'Z').join('')).join(''),
+      centroid: (f) => {
+        let best = null, bestA = -1;
+        polys(f.geometry).forEach((poly) => {
+          const r = poly[0].map(pt);
+          let A = 0, cx = 0, cy = 0;
+          for (let i = 0, j = r.length - 1; i < r.length; j = i++) {
+            const c = r[j][0] * r[i][1] - r[i][0] * r[j][1];
+            A += c; cx += (r[j][0] + r[i][0]) * c; cy += (r[j][1] + r[i][1]) * c;
+          }
+          if (Math.abs(A) > bestA && A) { bestA = Math.abs(A); best = [cx / (3 * A), cy / (3 * A)]; }
+        });
+        return best || [NaN, NaN];
+      }
+    };
   }
   function zonesOf(d) {
     const zs = [];
@@ -940,7 +969,8 @@
     const box = $(id);
     const fc = { type: 'FeatureCollection', features: geo.map((g) => ({ type: 'Feature', properties: { district: g.district }, geometry: g.geometry })) };
     const max = d3.max(o.values.values()) || 1;
-    const scale = d3.scaleSequentialSqrt(d3.interpolateRgb(o.ramp[0], o.ramp[1])).domain([0, max]);
+    const ip = lerpHex(o.ramp[0], o.ramp[1]);
+    const scale = (v) => ip(Math.sqrt(v / max));
     const fill = (d) => { const v = o.values.get(d) || 0; return v > 0 ? scale(v) : 'transparent'; };
     const fmtV = o.fmtV || fmt;
     const tipLines = (d) => [[fill(d) === 'transparent' ? null : fill(d), fmtV(o.values.get(d) || 0) + ' ' + o.unitLabel], [null, 'โซน ' + (zonesOf(d).join(' / ') || '—')]];
@@ -977,8 +1007,8 @@
     const W = box.clientWidth, H = box.clientHeight;
     if (!W || !H) return;
     const focus = { type: 'FeatureCollection', features: fc.features.filter((f) => inZoneScope(f.properties.district)) };
-    const proj = d3.geoMercator().fitExtent([[8, 8], [W - 8, H - 8]], focus.features.length ? focus : fc);
-    const path = d3.geoPath(proj);
+    const proj = fitProjection((focus.features.length ? focus : fc).features, W, H, 8);
+    const path = proj.path;
     const svg = d3.select(box).append('svg').attr('viewBox', '0 0 ' + W + ' ' + H);
     const feats = fc.features.slice().sort((a, b) => (o.pick === a.properties.district) - (o.pick === b.properties.district));
     feats.forEach((f) => {
@@ -988,7 +1018,7 @@
     });
     if (zone !== 'all') {
       focus.features.forEach((f) => {
-        const c = path.centroid(f);
+        const c = proj.centroid(f);
         if (isFinite(c[0])) svg.append('text').attr('class', 'lbl').attr('x', c[0]).attr('y', c[1]).attr('text-anchor', 'middle').text(f.properties.district);
       });
     }
@@ -997,7 +1027,7 @@
     const box = $(id);
     box.replaceChildren();
     const r = el('span', 'ramp');
-    const it = d3.interpolateRgb(ramp[0], ramp[1]);
+    const it = lerpHex(ramp[0], ramp[1]);
     r.style.background = 'linear-gradient(90deg,' + d3.range(0, 1.01, 0.25).map((t) => it(t)).join(',') + ')';
     box.append(el('span', null, '0'), r, el('span', null, (fmtV || fmt)(max) + ' ' + label));
   }
@@ -1120,7 +1150,7 @@
     ustats = ds[4].data;
     unitmap = ds[7].data;
     colormap = ds[8].data;
-    geo = ds[9].data.map((r) => ({ district: r.district, area: +r.area, geometry: d3Wind(typeof r.geometry === 'string' ? JSON.parse(r.geometry) : r.geometry) }));
+    geo = ds[9].data.map((r) => ({ district: r.district, area: +r.area, geometry: typeof r.geometry === 'string' ? JSON.parse(r.geometry) : r.geometry }));
     hstats = ds[5].data;
     zoneDists = new Map();
     ds[3].data.forEach((r) => {
